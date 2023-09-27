@@ -86,7 +86,7 @@ public class L_System : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.A))
         {
             TurtleConversion();
-            
+            Debug.Log(sentence);
         }
     }
 }
