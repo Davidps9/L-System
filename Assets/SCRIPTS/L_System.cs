@@ -70,7 +70,43 @@ public class L_System : MonoBehaviour
 
         }
         sentence = newSentence;
-       
+        CreateTree();
+    }
+
+    private void CreateTree()
+    {
+        float counter = 0;
+        foreach(char word in sentence)
+        {
+            GameObject branch;
+            switch (word)
+            {           
+                case 'F':
+                    counter+=2;
+                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    branch.transform.position = new Vector3(0, counter, 0);
+                    break;
+                case'+':
+
+                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    branch.transform.position = new Vector3(0.5f, counter, 0.5f);
+                    branch.transform.localEulerAngles = new Vector3(25, 0, -25);
+                    break;
+
+                case '-':
+                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    branch.transform.position = new Vector3(-0.5f, counter, -0.5f);
+                    branch.transform.localEulerAngles = new Vector3(-25, 0, 25);
+                    break;
+                default:
+                    counter += 2;
+                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    branch.transform.position = new Vector3(0, counter, 0);
+                    break;
+
+
+            }
+        }
     }
 
     void Start()
@@ -87,6 +123,7 @@ public class L_System : MonoBehaviour
         {
             TurtleConversion();
             Debug.Log(sentence);
+            
         }
     }
 }
