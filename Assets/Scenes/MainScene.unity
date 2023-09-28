@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 634008208}
   - component: {fileID: 634008207}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: L_System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac5f3516a40b140448d662d673256186, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cylinderPrefab: {fileID: 5300569601849557271, guid: 2f4a714d6bf70e249a8dbf75a81774f9, type: 3}
 --- !u!4 &634008208
 Transform:
   m_ObjectHideFlags: 0

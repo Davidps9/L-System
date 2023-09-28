@@ -27,7 +27,19 @@ public class L_System : MonoBehaviour
     case '+': //Adds a center point for mesh Generation
     case 'F': //Combines 'T' and '+' for continuity with L-System
      */
-    // Start is called before the first frame update
+
+    /*
+     * 
+     * 'F': End transformations
+     * '-': Rotate CCW
+     * '+': Rotate CW
+     * '[': Set as child of previous object
+     * ']': Go up 1 level in hierarchy
+     * 
+     * */
+    [SerializeField] private GameObject cylinderPrefab;
+
+    
 
     class Rule
     {
@@ -72,41 +84,69 @@ public class L_System : MonoBehaviour
 
         }
         sentence = newSentence;
-        CreateTree();
+        StartCoroutine(CreateTree());
     }
 
-    private void CreateTree()
+    private IEnumerator CreateTree()
     {
-        float counter = 0;
-        foreach(char word in sentence)
-        {
+        GameObject currentBranch = new("0");
+        GameObject currentParent = gameObject;
 
+        int count = 1;
+        foreach (char word in sentence)
+        {
+            yield return new WaitForSeconds(0.01f);
             switch (word)
             {           
                 case 'F':
-                    counter+=2;
-                    CreateBranch(false, 0, 0, counter, transform);
+                    GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
+
+                    currentBranch.transform.SetParent(currentParent.transform, false);
+                    currentBranch.transform.position += Vector3.up * 2;
+
+                    GameObject previousBranch = currentBranch;
+                    currentBranch = new(count.ToString());
+                    count++;
+                    currentBranch.transform.position = previousBranch.transform.position;
+                    currentBranch.transform.rotation = previousBranch.transform.rotation;
+                    //counter+=2;
+                    //CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case'+':
-
-                    CreateBranch(true, 25, 1, counter, transform);
+                    currentBranch.transform.Rotate(25, 0, -25);
+                    //CreateBranch(true, 25, 1, counter, transform);
 
                     break;
 
                 case '-':
-                    CreateBranch(true, 25, -1, counter, transform);
+                    currentBranch.transform.Rotate(-25, 0, 25);
+                    //CreateBranch(true, 25, -1, counter, transform);
 
                     break;
-
-
-                default:
-                    counter += 2;
-                    CreateBranch(false, 0, 0, counter, transform);
-
+                case '[':
+                    currentBranch.transform.SetParent(currentParent.transform);
+                    currentParent = currentBranch;
+                    currentBranch = new(count.ToString());
+                    count++;
                     break;
+
+                case ']':
+                    currentParent = currentParent.transform.parent.gameObject;
+                    currentBranch = new(count.ToString());
+                    count++;
+                    break;
+                
+
+
+                //default:
+                //    counter += 2;
+                //    CreateBranch(false, 0, 0, counter, transform);
+
+                //    break;
 
 
             }
+            
         }
     }
 
@@ -132,9 +172,8 @@ public class L_System : MonoBehaviour
     }
     void Start()
     {
-       
         GenerateRules();    
-        TurtleConversion();
+        //TurtleConversion();
     }
 
     // Update is called once per frame
