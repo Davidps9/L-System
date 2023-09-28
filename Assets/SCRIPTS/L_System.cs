@@ -95,12 +95,13 @@ public class L_System : MonoBehaviour
         int count = 1;
         foreach (char word in sentence)
         {
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForEndOfFrame();
+
             switch (word)
             {           
                 case 'F':
-                    GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
 
+                    GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
                     currentBranch.transform.SetParent(currentParent.transform, false);
                     currentBranch.transform.position += Vector3.up * 2;
 
@@ -109,17 +110,17 @@ public class L_System : MonoBehaviour
                     count++;
                     currentBranch.transform.position = previousBranch.transform.position;
                     currentBranch.transform.rotation = previousBranch.transform.rotation;
-                    //counter+=2;
+
                     //CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case'+':
-                    currentBranch.transform.Rotate(25, 0, -25);
+                    currentBranch.transform.localEulerAngles += new Vector3(0, 0, 25);
                     //CreateBranch(true, 25, 1, counter, transform);
 
                     break;
 
                 case '-':
-                    currentBranch.transform.Rotate(-25, 0, 25);
+                    currentBranch.transform.localEulerAngles += new Vector3(0, 0, -25);
                     //CreateBranch(true, 25, -1, counter, transform);
 
                     break;
