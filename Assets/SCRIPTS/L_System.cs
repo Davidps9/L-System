@@ -1,9 +1,11 @@
+using Palmmedia.ReportGenerator.Core.Parser.Analysis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class L_System : MonoBehaviour
 {
@@ -78,30 +80,29 @@ public class L_System : MonoBehaviour
         float counter = 0;
         foreach(char word in sentence)
         {
-            GameObject branch;
+
             switch (word)
             {           
                 case 'F':
                     counter+=2;
-                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    branch.transform.position = new Vector3(0, counter, 0);
+                    CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case'+':
 
-                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    branch.transform.position = new Vector3(0.5f, counter, 0.5f);
-                    branch.transform.localEulerAngles = new Vector3(25, 0, -25);
+                    CreateBranch(true, 25, 1, counter, transform);
+
                     break;
 
                 case '-':
-                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    branch.transform.position = new Vector3(-0.5f, counter, -0.5f);
-                    branch.transform.localEulerAngles = new Vector3(-25, 0, 25);
+                    CreateBranch(true, 25, -1, counter, transform);
+
                     break;
+
+
                 default:
                     counter += 2;
-                    branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    branch.transform.position = new Vector3(0, counter, 0);
+                    CreateBranch(false, 0, 0, counter, transform);
+
                     break;
 
 
@@ -109,6 +110,26 @@ public class L_System : MonoBehaviour
         }
     }
 
+    private void CreateBranch(bool hasToRotate, float angle, float angleDirection, float ObjectCounter, Transform parent)
+    {
+        float counter = ObjectCounter;
+        GameObject branch;
+
+        branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        branch.transform.parent = parent;
+
+        if (hasToRotate)
+        {
+            branch.transform.localEulerAngles = new Vector3(angleDirection * angle, 0, -angleDirection * angle);
+            branch.transform.position = new Vector3(angleDirection * branch.transform.localScale.x / 2, counter, angleDirection * branch.transform.localScale.x / 2);
+
+        }
+        else
+        {
+            branch.transform.position = new Vector3(0, counter, 0);
+
+        }
+    }
     void Start()
     {
        
