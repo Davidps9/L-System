@@ -1,11 +1,7 @@
-using Palmmedia.ReportGenerator.Core.Parser.Analysis;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class L_System : MonoBehaviour
 {
@@ -37,34 +33,33 @@ public class L_System : MonoBehaviour
      * ']': Go up 1 level in hierarchy
      * 
      * */
+    [Header("L-System Parameters")]
+    [SerializeField] private string axiom;
+    [SerializeField] private Rule[] rules;
+    [SerializeField] private float rotationAngle;
     [SerializeField] private GameObject cylinderPrefab;
+    [SerializeField] private string pivotBranchTag;
 
-    
-
+    [Serializable]
     class Rule
     {
         public char originalCase;
         public string conversion;
     }
+    private string sentence;
 
-    private List<Rule> rules = new List<Rule>();
-    private string axiom = "F";
-    private string sentence = "";
-    public void GenerateRules()
+    void Start()
     {
-        sentence += axiom;
-        Rule rule1 = new Rule();
-        rule1.originalCase = 'F';
-        rule1.conversion = "FF-[-F+F+F]+[+F-F-F]";
-        rules.Add(rule1);
-
+        sentence = axiom;
+        //TurtleConversion();
     }
+
     private void TurtleConversion()
     {
         string newSentence = "";
-        foreach (char word  in sentence)
+        foreach (char word in sentence)
         {
-        
+
             bool found = false;
 
             foreach (Rule rule in rules)
@@ -76,7 +71,7 @@ public class L_System : MonoBehaviour
                     break;
                 }
             }
-            
+
             if (!found)
             {
                 newSentence += word;
@@ -84,76 +79,97 @@ public class L_System : MonoBehaviour
 
         }
         sentence = newSentence;
+
+        if (gameObject.transform.childCount > 0)
+        {
+            Destroy(gameObject.transform.GetChild(0).gameObject);
+        }
         StartCoroutine(CreateTree());
     }
 
     private IEnumerator CreateTree()
     {
+        List<GameObject> pushedBranches = new List<GameObject>();
         GameObject currentBranch = new("0");
-        GameObject currentParent = gameObject;
-        float zangle = 0;
+        GameObject previousBranch = gameObject;
+        currentBranch.transform.SetParent(previousBranch.transform, false);
+
+        //float zangle = 0;
         int count = 1;
         foreach (char word in sentence)
         {
             yield return new WaitForEndOfFrame();
 
             switch (word)
-            {           
+            {
                 case 'F':
 
                     GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
-                    currentBranch.transform.SetParent(currentParent.transform, false);
-                    currentBranch.transform.position += Vector3.up * 2;
+                    if (!previousBranch.CompareTag(pivotBranchTag))
+                    {
+                        currentBranch.transform.localPosition += Vector3.up * 2;
+                    }
 
-                    GameObject previousBranch = currentBranch;
+                    previousBranch = currentBranch;
                     currentBranch = new(count.ToString());
+                    currentBranch.transform.SetParent(previousBranch.transform, false);
                     count++;
-                    currentBranch.transform.position = previousBranch.transform.position;
-                    currentBranch.transform.rotation = previousBranch.transform.rotation;
 
-                    Debug.Log(currentBranch.transform.position);
+                    //Debug.Log(currentBranch.transform.position);
                     //CreateBranch(false, 0, 0, counter, transform);
                     break;
-                case'+':
-                    zangle += 25;
-                    currentBranch.transform.localEulerAngles = new Vector3(0, 0, zangle);
+                case '+':
+                    currentBranch.transform.localEulerAngles += new Vector3(0, 0, rotationAngle);
 
                     //CreateBranch(true, 25, 1, counter, transform);
 
                     break;
 
                 case '-':
-                    zangle -= 25;
-                    currentBranch.transform.localEulerAngles = new Vector3(0, 0, zangle);
+
+                    currentBranch.transform.localEulerAngles = new Vector3(0, 0, -rotationAngle);
 
                     //CreateBranch(true, 25, -1, counter, transform);
 
                     break;
                 case '[':
-                    currentBranch.transform.SetParent(currentParent.transform);
-                    currentParent = currentBranch;
+                    currentBranch.tag = "PivotBranch";
+                    currentBranch.name = "Push";
+                    if (!previousBranch.CompareTag(pivotBranchTag))
+                    {
+                        currentBranch.transform.localPosition += Vector3.up * 2;
+                    }
+                    pushedBranches.Add(currentBranch.transform.parent.gameObject);
+                    previousBranch = currentBranch;
+
                     currentBranch = new(count.ToString());
+                    currentBranch.transform.SetParent(previousBranch.transform, false);
                     count++;
                     break;
 
                 case ']':
-                    currentParent = currentParent.transform.parent.gameObject;
+                    Destroy(currentBranch);
+
+                    previousBranch = pushedBranches[pushedBranches.Count - 1];
+                    pushedBranches.Remove(previousBranch);
+
                     currentBranch = new(count.ToString());
+                    currentBranch.transform.SetParent(previousBranch.transform, false);
+
                     count++;
-                    zangle = 0;
                     break;
-                
 
 
-                //default:
-                //    counter += 2;
-                //    CreateBranch(false, 0, 0, counter, transform);
 
-                //    break;
+                    //default:
+                    //    counter += 2;
+                    //    CreateBranch(false, 0, 0, counter, transform);
+
+                    //    break;
 
 
             }
-            
+
         }
     }
 
@@ -177,20 +193,15 @@ public class L_System : MonoBehaviour
 
         }
     }
-    void Start()
-    {
-        GenerateRules();    
-        //TurtleConversion();
-    }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.A))
         {
             TurtleConversion();
             Debug.Log(sentence);
-            
+
         }
     }
 }
