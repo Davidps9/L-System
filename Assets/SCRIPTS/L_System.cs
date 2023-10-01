@@ -91,7 +91,7 @@ public class L_System : MonoBehaviour
     {
         GameObject currentBranch = new("0");
         GameObject currentParent = gameObject;
-
+        float zangle = 0;
         int count = 1;
         foreach (char word in sentence)
         {
@@ -111,16 +111,21 @@ public class L_System : MonoBehaviour
                     currentBranch.transform.position = previousBranch.transform.position;
                     currentBranch.transform.rotation = previousBranch.transform.rotation;
 
+                    Debug.Log(currentBranch.transform.position);
                     //CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case'+':
-                    currentBranch.transform.localEulerAngles += new Vector3(0, 0, 25);
+                    zangle += 25;
+                    currentBranch.transform.localEulerAngles = new Vector3(0, 0, zangle);
+
                     //CreateBranch(true, 25, 1, counter, transform);
 
                     break;
 
                 case '-':
-                    currentBranch.transform.localEulerAngles += new Vector3(0, 0, -25);
+                    zangle -= 25;
+                    currentBranch.transform.localEulerAngles = new Vector3(0, 0, zangle);
+
                     //CreateBranch(true, 25, -1, counter, transform);
 
                     break;
@@ -135,6 +140,7 @@ public class L_System : MonoBehaviour
                     currentParent = currentParent.transform.parent.gameObject;
                     currentBranch = new(count.ToString());
                     count++;
+                    zangle = 0;
                     break;
                 
 
