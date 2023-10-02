@@ -155,8 +155,8 @@ MonoBehaviour:
   axiom: F
   rules:
   - originalCase: 70
-    conversion: FF+[F]-[F]
-  rotationAngle: 45
+    conversion: FF+[+F-F-F]-[-F+F+F]
+  rotationAngle: 25
   cylinderPrefab: {fileID: 5300569601849557271, guid: 2f4a714d6bf70e249a8dbf75a81774f9, type: 3}
   pivotBranchTag: PivotBranch
 --- !u!4 &634008208
