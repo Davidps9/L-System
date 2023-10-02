@@ -94,6 +94,8 @@ public class L_System : MonoBehaviour
         GameObject previousBranch = gameObject;
         currentBranch.transform.SetParent(previousBranch.transform, false);
 
+        float xangle = 0;
+
         //float zangle = 0;
         int count = 1;
         foreach (char word in sentence)
@@ -119,15 +121,16 @@ public class L_System : MonoBehaviour
                     //CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case '+':
-                    currentBranch.transform.localEulerAngles += new Vector3(0, 0, rotationAngle);
+                    xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
+                    currentBranch.transform.localEulerAngles += new Vector3(xangle, 0, rotationAngle);
 
                     //CreateBranch(true, 25, 1, counter, transform);
 
                     break;
 
                 case '-':
-
-                    currentBranch.transform.localEulerAngles = new Vector3(0, 0, -rotationAngle);
+                    xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
+                    currentBranch.transform.localEulerAngles = new Vector3(xangle, 0, -rotationAngle);
 
                     //CreateBranch(true, 25, -1, counter, transform);
 
@@ -160,39 +163,11 @@ public class L_System : MonoBehaviour
                     break;
 
 
-
-                    //default:
-                    //    counter += 2;
-                    //    CreateBranch(false, 0, 0, counter, transform);
-
-                    //    break;
-
-
             }
 
         }
     }
 
-    private void CreateBranch(bool hasToRotate, float angle, float angleDirection, float ObjectCounter, Transform parent)
-    {
-        float counter = ObjectCounter;
-        GameObject branch;
-
-        branch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        branch.transform.parent = parent;
-
-        if (hasToRotate)
-        {
-            branch.transform.localEulerAngles = new Vector3(angleDirection * angle, 0, -angleDirection * angle);
-            branch.transform.position = new Vector3(angleDirection * branch.transform.localScale.x / 2, counter, angleDirection * branch.transform.localScale.x / 2);
-
-        }
-        else
-        {
-            branch.transform.position = new Vector3(0, counter, 0);
-
-        }
-    }
 
     // Update is called once per frame
     void Update()
