@@ -39,6 +39,7 @@ public class L_System : MonoBehaviour
     [SerializeField] private float rotationAngle;
     [SerializeField] private GameObject cylinderPrefab;
     [SerializeField] private string pivotBranchTag;
+    [SerializeField]private Mesh mesh;
 
     [Serializable]
     class Rule
@@ -46,12 +47,15 @@ public class L_System : MonoBehaviour
         public char originalCase;
         public string conversion;
     }
+
+
     private string sentence;
 
     void Start()
     {
         sentence = axiom;
         //TurtleConversion();
+       
     }
 
     private void TurtleConversion()
@@ -89,10 +93,13 @@ public class L_System : MonoBehaviour
 
     private IEnumerator CreateTree()
     {
-        List<GameObject> pushedBranches = new List<GameObject>();
-        GameObject currentBranch = new("0");
+        List<CombineInstance> combineInstances = new List<CombineInstance>();
+
+        List < GameObject> pushedBranches = new List<GameObject>();
+        GameObject currentBranch = new();
         GameObject previousBranch = gameObject;
         currentBranch.transform.SetParent(previousBranch.transform, false);
+        currentBranch.transform.position = Vector3.up;
 
         float xangle = 0;
 
@@ -106,13 +113,22 @@ public class L_System : MonoBehaviour
             {
                 case 'F':
 
-                    GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
+                    //GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
+                    
+
                     if (!previousBranch.CompareTag(pivotBranchTag))
                     {
                         currentBranch.transform.localPosition += Vector3.up * 2;
                     }
 
+
+                    CombineInstance combineInstance = new CombineInstance();
+                    combineInstance.mesh = mesh;
+                    combineInstance.transform = currentBranch.transform.localToWorldMatrix;
+                    combineInstances.Add(combineInstance);
+
                     previousBranch = currentBranch;
+
                     currentBranch = new(count.ToString());
                     currentBranch.transform.SetParent(previousBranch.transform, false);
                     count++;
@@ -166,9 +182,24 @@ public class L_System : MonoBehaviour
             }
 
         }
+        MergeMeshes(combineInstances);
     }
 
+    private void MergeMeshes(List<CombineInstance> list)
+    {
+        Mesh newMesh = new Mesh();
+        newMesh.CombineMeshes(list.ToArray());
+        GetComponent<MeshFilter>().mesh = newMesh;
+        AssignDefaultShader();
 
+    }
+    public void AssignDefaultShader()
+    {
+        //assign it a white Diffuse shader, it's better than the default magenta
+        MeshRenderer meshRenderer = (MeshRenderer)gameObject.GetComponent<MeshRenderer>();
+        meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
+        meshRenderer.sharedMaterial.color = Color.white;
+    }
     // Update is called once per frame
     void Update()
     {
