@@ -13,9 +13,10 @@ public class MeshGenerator : MonoBehaviour
 {
     Mesh mesh;
 
-    List<Vector3> vertices = new List<Vector3>();
-    List <int> triangles = new List<int>();
-    [SerializeField] int vertexDepth = 4;
+    private List<Vector3> vertices = new List<Vector3>();
+    private List <int> triangles = new List<int>();
+    [SerializeField] int sideCount = 4;
+    [SerializeField] int radius = 4;
     private void Start()
     {
         mesh = GetComponent<MeshFilter>().mesh;
@@ -23,60 +24,33 @@ public class MeshGenerator : MonoBehaviour
     public void GenerateVertex(Vector3 position)
     {     
 
-
         vertices.Add(position);
-        vertices.Add(position + Vector3.right);
-        vertices.Add(position + Vector3.back);
-        vertices.Add(position + Vector3.back + Vector3.right);
-
-        if (vertices.Count > vertexDepth)
+        for (int i = 0; i < sideCount; i++)
+        {
+            float angle = Mathf.PI * 2 * i / sideCount;
+            Vector3 P = new Vector3(radius * Mathf.Sin(angle), position.y, radius * Mathf.Cos(angle));
+            vertices.Add(P);    
+        }
+        int ogIndex = vertices.IndexOf(position);
+        for (int i = 0; i < sideCount ; i++)
         {
 
-            AddBase(vertices.IndexOf(position));
-
-            //for (int i = 0; i < vertexDepth; i++)
-            //{
-                AddWall(vertices.IndexOf(position), 0);
-                AddWall(vertices.IndexOf(position), 1);
-               
-            //}
-
-
-
-
+            triangles.Add(ogIndex);
+            triangles.Add(ogIndex + 1 + (i + 1) % sideCount);
+            triangles.Add(ogIndex + 1 + i); 
         }
-        else
-        {
-            AddBase(vertices.IndexOf(position));
-        }
-       
+            
     }
 
-    private void AddWall(int index,int offset)
-    {
-        int res = 1 + offset;
-        triangles.Add(index  + offset);
-        triangles.Add(index - (4 - offset));
-        triangles.Add(index - (3 + offset));
-        triangles.Add(index + res);
-        triangles.Add(index + offset);
-        triangles.Add(index - (3 + offset));
-    }
 
     public void UpdateMesh()
     {
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
         mesh.RecalculateNormals();
     }
 
-    private void AddBase(int index)
-    {
-        triangles.Add(index);
-        triangles.Add(index + 2);
-        triangles.Add(index + 3);
-        triangles.Add(index);
-        triangles.Add(index + 3);
-        triangles.Add(index + 1);
-    }
+  
 }
