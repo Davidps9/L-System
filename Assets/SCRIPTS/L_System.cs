@@ -39,7 +39,8 @@ public class L_System : MonoBehaviour
     [SerializeField] private float rotationAngle;
     [SerializeField] private GameObject cylinderPrefab;
     [SerializeField] private string pivotBranchTag;
-    [SerializeField]private Mesh mesh;
+  //  [SerializeField]private Mesh mesh;
+    private MeshGenerator meshGeneratorscript;
 
     [Serializable]
     class Rule
@@ -55,7 +56,7 @@ public class L_System : MonoBehaviour
     {
         sentence = axiom;
         //TurtleConversion();
-       
+       meshGeneratorscript = GetComponent<MeshGenerator>(); 
     }
 
     private void TurtleConversion()
@@ -121,11 +122,11 @@ public class L_System : MonoBehaviour
                         currentBranch.transform.localPosition += Vector3.up * 2;
                     }
 
-
-                    CombineInstance combineInstance = new CombineInstance();
-                    combineInstance.mesh = mesh;
-                    combineInstance.transform = currentBranch.transform.localToWorldMatrix;
-                    combineInstances.Add(combineInstance);
+                    meshGeneratorscript.GenerateVertex(currentBranch.transform.position);
+                    //CombineInstance combineInstance = new CombineInstance();
+                    //combineInstance.mesh = mesh;
+                    //combineInstance.transform = currentBranch.transform.localToWorldMatrix;
+                    //combineInstances.Add(combineInstance);
 
                     previousBranch = currentBranch;
 
@@ -182,7 +183,9 @@ public class L_System : MonoBehaviour
             }
 
         }
-        MergeMeshes(combineInstances);
+        //MergeMeshes(combineInstances);
+        meshGeneratorscript.UpdateMesh();
+        AssignDefaultShader();
     }
 
     private void MergeMeshes(List<CombineInstance> list)
