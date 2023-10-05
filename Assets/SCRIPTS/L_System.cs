@@ -31,7 +31,8 @@ public class L_System : MonoBehaviour
      * '+': Rotate CW
      * '[': Set as child of previous object
      * ']': Go up 1 level in hierarchy
-     * 
+     * FF+[+F-F-F]-[-F+F+F]
+     * angulo 25
      * */
     [Header("L-System Parameters")]
     [SerializeField] private string axiom;
@@ -97,32 +98,34 @@ public class L_System : MonoBehaviour
         List<CombineInstance> combineInstances = new List<CombineInstance>();
 
         List < GameObject> pushedBranches = new List<GameObject>();
-        GameObject currentBranch = new();
+        GameObject currentBranch = new("0");
         GameObject previousBranch = gameObject;
         currentBranch.transform.SetParent(previousBranch.transform, false);
-        currentBranch.transform.position = Vector3.up;
+        currentBranch.transform.position = Vector3.zero;
+        meshGeneratorscript.GenerateVertex(currentBranch.transform.position, Vector3.positiveInfinity);
+        
 
         float xangle = 0;
 
-        //float zangle = 0;
-        int count = 1;
+        int count = 0;
         foreach (char word in sentence)
         {
             yield return new WaitForEndOfFrame();
+            count++;
 
+            Debug.Log("Progress: "+ 100.0f * count / sentence.Length + "%");
             switch (word)
             {
                 case 'F':
 
                     //GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
+
+
                     
+                    currentBranch.transform.localPosition += Vector3.up * 2;
+                    
+                    meshGeneratorscript.GenerateVertex(currentBranch.transform.position, previousBranch.transform.position);
 
-                    if (!previousBranch.CompareTag(pivotBranchTag))
-                    {
-                        currentBranch.transform.localPosition += Vector3.up * 2;
-                    }
-
-                    meshGeneratorscript.GenerateVertex(currentBranch.transform.position);
                     //CombineInstance combineInstance = new CombineInstance();
                     //combineInstance.mesh = mesh;
                     //combineInstance.transform = currentBranch.transform.localToWorldMatrix;
@@ -132,7 +135,6 @@ public class L_System : MonoBehaviour
 
                     currentBranch = new(count.ToString());
                     currentBranch.transform.SetParent(previousBranch.transform, false);
-                    count++;
 
                     //Debug.Log(currentBranch.transform.position);
                     //CreateBranch(false, 0, 0, counter, transform);
@@ -155,16 +157,15 @@ public class L_System : MonoBehaviour
                 case '[':
                     currentBranch.tag = "PivotBranch";
                     currentBranch.name = "Push";
-                    if (!previousBranch.CompareTag(pivotBranchTag))
-                    {
-                        currentBranch.transform.localPosition += Vector3.up * 2;
-                    }
+                    //if (!previousBranch.CompareTag(pivotBranchTag))
+                    //{
+                    //    currentBranch.transform.localPosition += Vector3.up * 2;
+                    //}
                     pushedBranches.Add(currentBranch.transform.parent.gameObject);
                     previousBranch = currentBranch;
 
                     currentBranch = new(count.ToString());
                     currentBranch.transform.SetParent(previousBranch.transform, false);
-                    count++;
                     break;
 
                 case ']':
@@ -176,10 +177,9 @@ public class L_System : MonoBehaviour
                     currentBranch = new(count.ToString());
                     currentBranch.transform.SetParent(previousBranch.transform, false);
 
-                    count++;
                     break;
 
-
+                
             }
 
         }
@@ -208,6 +208,7 @@ public class L_System : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
+            meshGeneratorscript.ResetMesh();
             TurtleConversion();
             Debug.Log(sentence);
 
