@@ -95,8 +95,6 @@ public class L_System : MonoBehaviour
 
     private IEnumerator CreateTree()
     {
-        List<CombineInstance> combineInstances = new List<CombineInstance>();
-
         List < GameObject> pushedBranches = new List<GameObject>();
         GameObject currentBranch = new("0");
         GameObject previousBranch = gameObject;
@@ -107,7 +105,6 @@ public class L_System : MonoBehaviour
         
 
         float xangle = 0;
-
         int count = 0;
         foreach (char word in sentence)
         {
@@ -190,19 +187,10 @@ public class L_System : MonoBehaviour
         meshGeneratorscript.UpdateMesh();
         AssignDefaultShader();
     }
-
-    private void MergeMeshes(List<CombineInstance> list)
-    {
-        Mesh newMesh = new Mesh();
-        newMesh.CombineMeshes(list.ToArray());
-        GetComponent<MeshFilter>().mesh = newMesh;
-        AssignDefaultShader();
-
-    }
     public void AssignDefaultShader()
     {
         //assign it a white Diffuse shader, it's better than the default magenta
-        MeshRenderer meshRenderer = (MeshRenderer)gameObject.GetComponent<MeshRenderer>();
+        MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
         meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
         meshRenderer.sharedMaterial.color = Color.white;
     }
