@@ -102,7 +102,8 @@ public class L_System : MonoBehaviour
         GameObject previousBranch = gameObject;
         currentBranch.transform.SetParent(previousBranch.transform, false);
         currentBranch.transform.position = Vector3.zero;
-        meshGeneratorscript.GenerateVertex(currentBranch.transform.position, Vector3.positiveInfinity);
+
+        meshGeneratorscript.GenerateVertex(currentBranch.transform.position, Vector3.positiveInfinity, Vector3.zero);
         
 
         float xangle = 0;
@@ -124,7 +125,9 @@ public class L_System : MonoBehaviour
                     
                     currentBranch.transform.localPosition += Vector3.up * 2;
                     
-                    meshGeneratorscript.GenerateVertex(currentBranch.transform.position, previousBranch.transform.position);
+                    Vector3 angle = previousBranch.transform.eulerAngles + ((currentBranch.transform.eulerAngles - previousBranch.transform.eulerAngles )/2);
+
+                    meshGeneratorscript.GenerateVertex(currentBranch.transform.position, previousBranch.transform.position,angle);
 
                     //CombineInstance combineInstance = new CombineInstance();
                     //combineInstance.mesh = mesh;
@@ -140,7 +143,7 @@ public class L_System : MonoBehaviour
                     //CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case '+':
-                    xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
+                    //xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
                     currentBranch.transform.localEulerAngles += new Vector3(xangle, 0, rotationAngle);
 
                     //CreateBranch(true, 25, 1, counter, transform);
@@ -148,7 +151,7 @@ public class L_System : MonoBehaviour
                     break;
 
                 case '-':
-                    xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
+                    //xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
                     currentBranch.transform.localEulerAngles = new Vector3(xangle, 0, -rotationAngle);
 
                     //CreateBranch(true, 25, -1, counter, transform);

@@ -22,16 +22,22 @@ public class MeshGenerator : MonoBehaviour
     {
         mesh = GetComponent<MeshFilter>().mesh;
     }
-    public void GenerateVertex(Vector3 position, Vector3 previousPos)
+    public void GenerateVertex(Vector3 position, Vector3 previousPos, Vector3 angle)
     {
+        Debug.Log(angle);
         int prevIndex = vertices.IndexOf(previousPos);
         vertices.Add(position);
         int ogIndex = vertices.IndexOf(position);
 
         for (int i = 0; i < sideCount; i++)
         {
-            float angle = Mathf.PI * 2 * i / sideCount;
-            Vector3 P = new Vector3((radius * Mathf.Sin(angle)) + position.x, position.y, (radius * Mathf.Cos(angle)) + position.z);
+            float baseAngle = Mathf.PI * 2 * i / sideCount;
+
+            float hx = Mathf.Sin(angle.z) * radius ;
+            float hy = Mathf.Sin(angle.x) * radius ;
+            float h = (hx * Mathf.Sin(baseAngle)) + (hy * Mathf.Cos(baseAngle));
+
+            Vector3 P = new Vector3((radius * Mathf.Sin(baseAngle)) + position.x, position.y + h, (radius * Mathf.Cos(baseAngle)) + position.z);
             vertices.Add(P);    
         }
         for (int i = 0; i < sideCount ; i++)
