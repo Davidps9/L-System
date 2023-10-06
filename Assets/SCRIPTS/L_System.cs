@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshGenerator))]
 public class L_System : MonoBehaviour
 {
 
@@ -39,10 +40,7 @@ public class L_System : MonoBehaviour
     [SerializeField] private string axiom;
     [SerializeField] private Rule[] rules;
     [SerializeField] private float rotationAngle;
-    [SerializeField] private GameObject cylinderPrefab;
-    [SerializeField] private string pivotBranchTag;
-    //  [SerializeField]private Mesh mesh;
-    private MeshGenerator meshGeneratorscript;
+    private MeshGenerator meshGeneratorScript;
 
     [Serializable]
     class Rule
@@ -58,7 +56,7 @@ public class L_System : MonoBehaviour
     {
         sentence = axiom;
         //TurtleConversion();
-        meshGeneratorscript = GetComponent<MeshGenerator>();
+        meshGeneratorScript = GetComponent<MeshGenerator>();
     }
 
     private void TurtleConversion()
@@ -94,14 +92,14 @@ public class L_System : MonoBehaviour
         StartCoroutine(CreateTree());
     }
 
-    Branch currentBranch;
+    Node currentBranch;
     private IEnumerator CreateTree()
     {
-        List<Branch> pushedBranches = new List<Branch>();
+        List<Node> pushedBranches = new List<Node>();
         currentBranch = new();
-        Branch previousBranch = new();
+        Node previousBranch = new();
 
-        meshGeneratorscript.GenerateVertex(currentBranch.position, Vector3.positiveInfinity, Vector3.zero);
+        meshGeneratorScript.GenerateVertex(currentBranch.position, Vector3.positiveInfinity, Vector3.zero, true);
 
         float xangle = 0;
         int count = 0;
@@ -122,8 +120,8 @@ public class L_System : MonoBehaviour
                     currentBranch.localPosition += Vector3.up * 2;
 
                     Vector3 angle = previousBranch.rotation + ((currentBranch.rotation - previousBranch.rotation) / 2);
-
-                    meshGeneratorscript.GenerateVertex(currentBranch.position, previousBranch.position, angle);
+                    Debug.Log("prev rotation: " + previousBranch.rotation + ", curr rotation: " + currentBranch.rotation + ", total: " + angle);
+                    meshGeneratorScript.GenerateVertex(currentBranch.position, previousBranch.position, angle, false);
 
                     //CombineInstance combineInstance = new CombineInstance();
                     //combineInstance.mesh = mesh;
@@ -164,43 +162,24 @@ public class L_System : MonoBehaviour
                     break;
 
                 case ']':
-                    //Destroy(currentBranch);
-
                     previousBranch = pushedBranches[pushedBranches.Count - 1];
                     pushedBranches.Remove(previousBranch);
 
                     currentBranch = new(previousBranch, true);
                     break;
-
-
             }
-
         }
-        //MergeMeshes(combineInstances);
-        meshGeneratorscript.UpdateMesh();
-        AssignDefaultShader();
+        meshGeneratorScript.UpdateMesh();
     }
-    public void AssignDefaultShader()
-    {
-        //assign it a white Diffuse shader, it's better than the default magenta
-        MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-        meshRenderer.sharedMaterial.color = Color.white;
-    }
-    // Update is called once per frame
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            meshGeneratorscript.ResetMesh();
+            meshGeneratorScript.ResetMesh();
             TurtleConversion();
             Debug.Log(sentence);
 
         }
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Handles.Label(currentBranch.position, currentBranch.position.ToString());
-    //}
 }

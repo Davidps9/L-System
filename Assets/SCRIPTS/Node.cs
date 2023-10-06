@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Branch
+public class Node
 {
     public Vector3 localPosition
     {
@@ -54,9 +54,9 @@ public class Branch
         }
     }
     public Vector3 rotation;
-    public Branch parent;
+    public Node parent;
 
-    public Branch(Vector3 position, Vector3 rotation, Branch parent = null, bool isLocalPosition = false)
+    public Node(Vector3 position, Vector3 rotation, Node parent = null, bool isLocalPosition = false)
     {
         this.parent = parent;
 
@@ -71,7 +71,7 @@ public class Branch
             this.rotation = rotation;
         }
     }
-    public Branch(Branch _parent = null, bool isLocalPosition = false) : this(Vector3.zero, Vector3.zero, _parent, isLocalPosition) { }
+    public Node(Node _parent = null, bool isLocalPosition = false) : this(Vector3.zero, Vector3.zero, _parent, isLocalPosition) { }
 
     Vector3 localToWorldPosition(Vector3 localPosition)
     {
