@@ -12,7 +12,7 @@ public class Node
             }
             else
             {
-                return worldToLocalPosition(position);
+                return WorldToLocalPosition(position);
             }
         }
         set
@@ -23,7 +23,7 @@ public class Node
             }
             else
             {
-                position = localToWorldPosition(value);
+                position = LocalToWorldPosition(value);
             }
         }
     }
@@ -38,7 +38,7 @@ public class Node
             }
             else
             {
-                return worldToLocalRotation(rotation);
+                return WorldToLocalRotation(rotation);
             }
         }
         set
@@ -49,7 +49,7 @@ public class Node
             }
             else
             {
-                rotation = localToWorldRotation(value);
+                rotation = LocalToWorldRotation(value);
             }
         }
     }
@@ -73,27 +73,27 @@ public class Node
     }
     public Node(Node _parent = null, bool isLocalPosition = false) : this(Vector3.zero, Vector3.zero, _parent, isLocalPosition) { }
 
-    Vector3 localToWorldPosition(Vector3 localPosition)
+    Vector3 LocalToWorldPosition(Vector3 localPosition)
     {
-        return parent.position + rotatedPosition(localPosition, parent.rotation);
+        return parent.position + RotatedPosition(localPosition, parent.rotation);
     }
 
-    Vector3 worldToLocalPosition(Vector3 worldPosition)
+    Vector3 WorldToLocalPosition(Vector3 worldPosition)
     {
-        return rotatedPosition(worldPosition - parent.position, parent.rotation);
+        return RotatedPosition(worldPosition - parent.position, parent.rotation);
     }
 
-    Vector3 localToWorldRotation(Vector3 localRotation)
+    Vector3 LocalToWorldRotation(Vector3 localRotation)
     {
         return parent.rotation + localRotation;
     }
 
-    Vector3 worldToLocalRotation(Vector3 worldRotation)
+    Vector3 WorldToLocalRotation(Vector3 worldRotation)
     {
         return worldRotation - parent.rotation;
     }
 
-    Vector3 rotatedPosition(Vector3 position, Vector3 rotation)
+    Vector3 RotatedPosition(Vector3 position, Vector3 rotation)
     {
         Quaternion quaternion = Quaternion.Euler(rotation);
         Vector3 result = quaternion * position;

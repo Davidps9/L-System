@@ -20,22 +20,34 @@ public class MeshGenerator : MonoBehaviour
         AssignDefaultShader();
     }
 
-    public void GenerateVertex(Vector3 position, Vector3 previousPos, Vector3 angle, bool addCap)
+    public void GenerateVertex(Node node, bool addCap)
     {
-        int prevIndex = vertices.IndexOf(previousPos);
-        vertices.Add(position);
-        int ogIndex = vertices.IndexOf(position);
+        Vector3 angleBetween = Vector3.zero;
+        Vector3 localAngleBetween = Vector3.zero;
+        if (node.parent != null)
+        {
+            angleBetween = node.parent.rotation + ((node.rotation - node.parent.rotation) / 2);
+            localAngleBetween = (angleBetween - node.parent.rotation);
+        }
 
-        Quaternion rotation = Quaternion.Euler(angle.x, 0, angle.z);
-        //Vector2 scale = new Vector2(Mathf.Cos(angle.x) == 0 ? float.MaxValue : 1 / Mathf.Cos(angle.x), Mathf.Cos(angle.z) == 0 ? float.MaxValue : 1 / Mathf.Cos(angle.z));
+        Vector2 scale = new Vector2(
+            Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad),
+            Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad)
+        );
 
+        //Debug.Log("local rotation: " + node.localRotation + ", scale: " + scale);
+
+        vertices.Add(node.position);
+        int nodeIndex = vertices.IndexOf(node.position);
+
+        Quaternion rotation = Quaternion.Euler(angleBetween.x, 0, angleBetween.z);
         for (int i = 0; i < sideCount; i++)
         {
             float baseAngle = Mathf.PI * 2 * i / sideCount;
 
-            Vector3 vertex = new Vector3(radius * Mathf.Sin(baseAngle), 0, radius * Mathf.Cos(baseAngle));
+            Vector3 vertex = new Vector3(radius * Mathf.Sin(baseAngle) * scale.y, 0, radius * Mathf.Cos(baseAngle) * scale.x);
             vertex = rotation * vertex;
-            vertex += position;
+            vertex += node.position;
             vertices.Add(vertex);
         }
 
@@ -43,15 +55,16 @@ public class MeshGenerator : MonoBehaviour
         {
             for (int i = 0; i < sideCount; i++)
             {
-                triangles.Add(ogIndex);
-                triangles.Add(ogIndex + 1 + (i + 1) % sideCount);
-                triangles.Add(ogIndex + 1 + i);
+                triangles.Add(nodeIndex);
+                triangles.Add(nodeIndex + 1 + (i + 1) % sideCount);
+                triangles.Add(nodeIndex + 1 + i);
             }
         }
 
-        if (prevIndex != -1)
+        if (node.parent != null)
         {
-            CreateWalls(ogIndex, prevIndex);
+            int parentIndex = vertices.IndexOf(node.parent.position);
+            CreateWalls(nodeIndex, parentIndex);
         }
     }
 
@@ -64,7 +77,6 @@ public class MeshGenerator : MonoBehaviour
         mesh.RecalculateTangents();
         mesh.RecalculateNormals();
         //Debug.Log(vertices.Count);
-
     }
 
     private void CreateWalls(int index, int prevIndex)
@@ -81,7 +93,6 @@ public class MeshGenerator : MonoBehaviour
                 indexer = -(size - 1);
             }
 
-
             triangles.Add(topFirstIndex + i);
             triangles.Add(bottomFirstIndex + i);
             triangles.Add(bottomFirstIndex + indexer + i);
@@ -96,7 +107,6 @@ public class MeshGenerator : MonoBehaviour
     {
         vertices.Clear();
         triangles.Clear();
-
     }
 
     public void AssignDefaultShader()
