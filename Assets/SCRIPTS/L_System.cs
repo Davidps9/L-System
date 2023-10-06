@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshGenerator))]
 public class L_System : MonoBehaviour
 {
 
@@ -32,16 +33,14 @@ public class L_System : MonoBehaviour
      * '[': Set as child of previous object
      * ']': Go up 1 level in hierarchy
      * FF+[+F-F-F]-[-F+F+F]
+     * F+F−F−F+F
      * angulo 25
      * */
     [Header("L-System Parameters")]
     [SerializeField] private string axiom;
     [SerializeField] private Rule[] rules;
     [SerializeField] private float rotationAngle;
-    [SerializeField] private GameObject cylinderPrefab;
-    [SerializeField] private string pivotBranchTag;
-  //  [SerializeField]private Mesh mesh;
-    private MeshGenerator meshGeneratorscript;
+    private MeshGenerator meshGeneratorScript;
 
     [Serializable]
     class Rule
@@ -57,7 +56,7 @@ public class L_System : MonoBehaviour
     {
         sentence = axiom;
         //TurtleConversion();
-       meshGeneratorscript = GetComponent<MeshGenerator>(); 
+        meshGeneratorScript = GetComponent<MeshGenerator>();
     }
 
     private void TurtleConversion()
@@ -93,28 +92,23 @@ public class L_System : MonoBehaviour
         StartCoroutine(CreateTree());
     }
 
+    Node currentBranch;
     private IEnumerator CreateTree()
     {
-        List<CombineInstance> combineInstances = new List<CombineInstance>();
+        List<Node> pushedBranches = new List<Node>();
+        currentBranch = new();
+        Node previousBranch = new();
 
-        List < GameObject> pushedBranches = new List<GameObject>();
-        GameObject currentBranch = new("0");
-        GameObject previousBranch = gameObject;
-        currentBranch.transform.SetParent(previousBranch.transform, false);
-        currentBranch.transform.position = Vector3.zero;
-
-        meshGeneratorscript.GenerateVertex(currentBranch.transform.position, Vector3.positiveInfinity, Vector3.zero);
-        
+        meshGeneratorScript.GenerateVertex(currentBranch.position, Vector3.positiveInfinity, Vector3.zero, true);
 
         float xangle = 0;
-
         int count = 0;
         foreach (char word in sentence)
         {
             yield return new WaitForEndOfFrame();
             count++;
 
-            Debug.Log("Progress: "+ 100.0f * count / sentence.Length + "%");
+            Debug.Log("Progress: " + 100.0f * count / sentence.Length + "%");
             switch (word)
             {
                 case 'F':
@@ -122,12 +116,12 @@ public class L_System : MonoBehaviour
                     //GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
 
 
-                    
-                    currentBranch.transform.localPosition += Vector3.up * 2;
-                    
-                    Vector3 angle = previousBranch.transform.eulerAngles + ((currentBranch.transform.eulerAngles - previousBranch.transform.eulerAngles )/2);
 
-                    meshGeneratorscript.GenerateVertex(currentBranch.transform.position, previousBranch.transform.position,angle);
+                    currentBranch.localPosition += Vector3.up * 2;
+
+                    Vector3 angle = previousBranch.rotation + ((currentBranch.rotation - previousBranch.rotation) / 2);
+                    Debug.Log("prev rotation: " + previousBranch.rotation + ", curr rotation: " + currentBranch.rotation + ", total: " + angle);
+                    meshGeneratorScript.GenerateVertex(currentBranch.position, previousBranch.position, angle, false);
 
                     //CombineInstance combineInstance = new CombineInstance();
                     //combineInstance.mesh = mesh;
@@ -136,15 +130,14 @@ public class L_System : MonoBehaviour
 
                     previousBranch = currentBranch;
 
-                    currentBranch = new(count.ToString());
-                    currentBranch.transform.SetParent(previousBranch.transform, false);
+                    currentBranch = new(previousBranch, true);
 
                     //Debug.Log(currentBranch.transform.position);
                     //CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case '+':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
-                    currentBranch.transform.localEulerAngles += new Vector3(xangle, 0, rotationAngle);
+                    currentBranch.localRotation += new Vector3(xangle, 0, rotationAngle);
 
                     //CreateBranch(true, 25, 1, counter, transform);
 
@@ -152,66 +145,38 @@ public class L_System : MonoBehaviour
 
                 case '-':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
-                    currentBranch.transform.localEulerAngles = new Vector3(xangle, 0, -rotationAngle);
+                    currentBranch.localRotation += new Vector3(xangle, 0, -rotationAngle);
 
                     //CreateBranch(true, 25, -1, counter, transform);
 
                     break;
                 case '[':
-                    currentBranch.tag = "PivotBranch";
-                    currentBranch.name = "Push";
                     //if (!previousBranch.CompareTag(pivotBranchTag))
                     //{
                     //    currentBranch.transform.localPosition += Vector3.up * 2;
                     //}
-                    pushedBranches.Add(currentBranch.transform.parent.gameObject);
+                    pushedBranches.Add(currentBranch.parent);
                     previousBranch = currentBranch;
 
-                    currentBranch = new(count.ToString());
-                    currentBranch.transform.SetParent(previousBranch.transform, false);
+                    currentBranch = new(previousBranch, true);
                     break;
 
                 case ']':
-                    Destroy(currentBranch);
-
                     previousBranch = pushedBranches[pushedBranches.Count - 1];
                     pushedBranches.Remove(previousBranch);
 
-                    currentBranch = new(count.ToString());
-                    currentBranch.transform.SetParent(previousBranch.transform, false);
-
+                    currentBranch = new(previousBranch, true);
                     break;
-
-                
             }
-
         }
-        //MergeMeshes(combineInstances);
-        meshGeneratorscript.UpdateMesh();
-        AssignDefaultShader();
+        meshGeneratorScript.UpdateMesh();
     }
 
-    private void MergeMeshes(List<CombineInstance> list)
-    {
-        Mesh newMesh = new Mesh();
-        newMesh.CombineMeshes(list.ToArray());
-        GetComponent<MeshFilter>().mesh = newMesh;
-        AssignDefaultShader();
-
-    }
-    public void AssignDefaultShader()
-    {
-        //assign it a white Diffuse shader, it's better than the default magenta
-        MeshRenderer meshRenderer = (MeshRenderer)gameObject.GetComponent<MeshRenderer>();
-        meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-        meshRenderer.sharedMaterial.color = Color.white;
-    }
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            meshGeneratorscript.ResetMesh();
+            meshGeneratorScript.ResetMesh();
             TurtleConversion();
             Debug.Log(sentence);
 
