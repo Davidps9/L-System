@@ -1,11 +1,7 @@
 
 
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System;
-using UnityEngine.UIElements;
-using UnityEditor;
+using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -15,7 +11,7 @@ public class MeshGenerator : MonoBehaviour
     Mesh mesh;
 
     private List<Vector3> vertices = new List<Vector3>();
-    private List <int> triangles = new List<int>();
+    private List<int> triangles = new List<int>();
     [SerializeField] int sideCount = 4;
     [SerializeField] float radius = 4;
     private void Start()
@@ -33,18 +29,18 @@ public class MeshGenerator : MonoBehaviour
         {
             float baseAngle = Mathf.PI * 2 * i / sideCount;
 
-            float hx = Mathf.Sin(angle.z) * radius ;
-            float hy = Mathf.Sin(angle.x) * radius ;
+            float hx = Mathf.Sin(angle.z) * radius;
+            float hy = Mathf.Sin(angle.x) * radius;
             float h = (hx * Mathf.Sin(baseAngle)) + (hy * Mathf.Cos(baseAngle));
 
             Vector3 P = new Vector3((radius * Mathf.Sin(baseAngle)) + position.x, position.y + h, (radius * Mathf.Cos(baseAngle)) + position.z);
-            vertices.Add(P);    
+            vertices.Add(P);
         }
-        for (int i = 0; i < sideCount ; i++)
+        for (int i = 0; i < sideCount; i++)
         {
             triangles.Add(ogIndex);
             triangles.Add(ogIndex + 1 + (i + 1) % sideCount);
-            triangles.Add(ogIndex + 1 + i); 
+            triangles.Add(ogIndex + 1 + i);
         }
         if (prevIndex != -1)
         {
@@ -70,10 +66,10 @@ public class MeshGenerator : MonoBehaviour
         int bottomFirstIndex = prevIndex + 1;
         int topFirstIndex = index + 1;
 
-        for(int i = 0;i < size;i++)
+        for (int i = 0; i < size; i++)
         {
             int indexer = 1;
-            if(i == size - 1)
+            if (i == size - 1)
             {
                 indexer = -(size - 1);
             }
@@ -88,14 +84,6 @@ public class MeshGenerator : MonoBehaviour
             triangles.Add(topFirstIndex + indexer + i);
         }
     }
-    //private void OnDrawGizmos()
-    //{
-    //    for(int i = 0; i < vertices.Count;i++)
-    //    {
-    //        Handles.Label(vertices[i], i.ToString());
-
-    //    }
-    //}
 
     public void ResetMesh()
     {

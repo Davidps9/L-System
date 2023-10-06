@@ -32,6 +32,7 @@ public class L_System : MonoBehaviour
      * '[': Set as child of previous object
      * ']': Go up 1 level in hierarchy
      * FF+[+F-F-F]-[-F+F+F]
+     * F+F−F−F+F
      * angulo 25
      * */
     [Header("L-System Parameters")]
@@ -40,7 +41,7 @@ public class L_System : MonoBehaviour
     [SerializeField] private float rotationAngle;
     [SerializeField] private GameObject cylinderPrefab;
     [SerializeField] private string pivotBranchTag;
-  //  [SerializeField]private Mesh mesh;
+    //  [SerializeField]private Mesh mesh;
     private MeshGenerator meshGeneratorscript;
 
     [Serializable]
@@ -57,7 +58,7 @@ public class L_System : MonoBehaviour
     {
         sentence = axiom;
         //TurtleConversion();
-       meshGeneratorscript = GetComponent<MeshGenerator>(); 
+        meshGeneratorscript = GetComponent<MeshGenerator>();
     }
 
     private void TurtleConversion()
@@ -93,16 +94,14 @@ public class L_System : MonoBehaviour
         StartCoroutine(CreateTree());
     }
 
+    Branch currentBranch;
     private IEnumerator CreateTree()
     {
-        List < GameObject> pushedBranches = new List<GameObject>();
-        GameObject currentBranch = new("0");
-        GameObject previousBranch = gameObject;
-        currentBranch.transform.SetParent(previousBranch.transform, false);
-        currentBranch.transform.position = Vector3.zero;
+        List<Branch> pushedBranches = new List<Branch>();
+        currentBranch = new();
+        Branch previousBranch = new();
 
-        meshGeneratorscript.GenerateVertex(currentBranch.transform.position, Vector3.positiveInfinity, Vector3.zero);
-        
+        meshGeneratorscript.GenerateVertex(currentBranch.position, Vector3.positiveInfinity, Vector3.zero);
 
         float xangle = 0;
         int count = 0;
@@ -111,7 +110,7 @@ public class L_System : MonoBehaviour
             yield return new WaitForEndOfFrame();
             count++;
 
-            Debug.Log("Progress: "+ 100.0f * count / sentence.Length + "%");
+            Debug.Log("Progress: " + 100.0f * count / sentence.Length + "%");
             switch (word)
             {
                 case 'F':
@@ -119,12 +118,12 @@ public class L_System : MonoBehaviour
                     //GameObject cyl = Instantiate(cylinderPrefab, currentBranch.transform, false);
 
 
-                    
-                    currentBranch.transform.localPosition += Vector3.up * 2;
-                    
-                    Vector3 angle = previousBranch.transform.eulerAngles + ((currentBranch.transform.eulerAngles - previousBranch.transform.eulerAngles )/2);
 
-                    meshGeneratorscript.GenerateVertex(currentBranch.transform.position, previousBranch.transform.position,angle);
+                    currentBranch.localPosition += Vector3.up * 2;
+
+                    Vector3 angle = previousBranch.rotation + ((currentBranch.rotation - previousBranch.rotation) / 2);
+
+                    meshGeneratorscript.GenerateVertex(currentBranch.position, previousBranch.position, angle);
 
                     //CombineInstance combineInstance = new CombineInstance();
                     //combineInstance.mesh = mesh;
@@ -133,15 +132,14 @@ public class L_System : MonoBehaviour
 
                     previousBranch = currentBranch;
 
-                    currentBranch = new(count.ToString());
-                    currentBranch.transform.SetParent(previousBranch.transform, false);
+                    currentBranch = new(previousBranch, true);
 
                     //Debug.Log(currentBranch.transform.position);
                     //CreateBranch(false, 0, 0, counter, transform);
                     break;
                 case '+':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
-                    currentBranch.transform.localEulerAngles += new Vector3(xangle, 0, rotationAngle);
+                    currentBranch.localRotation += new Vector3(xangle, 0, rotationAngle);
 
                     //CreateBranch(true, 25, 1, counter, transform);
 
@@ -149,37 +147,32 @@ public class L_System : MonoBehaviour
 
                 case '-':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
-                    currentBranch.transform.localEulerAngles = new Vector3(xangle, 0, -rotationAngle);
+                    currentBranch.localRotation += new Vector3(xangle, 0, -rotationAngle);
 
                     //CreateBranch(true, 25, -1, counter, transform);
 
                     break;
                 case '[':
-                    currentBranch.tag = "PivotBranch";
-                    currentBranch.name = "Push";
                     //if (!previousBranch.CompareTag(pivotBranchTag))
                     //{
                     //    currentBranch.transform.localPosition += Vector3.up * 2;
                     //}
-                    pushedBranches.Add(currentBranch.transform.parent.gameObject);
+                    pushedBranches.Add(currentBranch.parent);
                     previousBranch = currentBranch;
 
-                    currentBranch = new(count.ToString());
-                    currentBranch.transform.SetParent(previousBranch.transform, false);
+                    currentBranch = new(previousBranch, true);
                     break;
 
                 case ']':
-                    Destroy(currentBranch);
+                    //Destroy(currentBranch);
 
                     previousBranch = pushedBranches[pushedBranches.Count - 1];
                     pushedBranches.Remove(previousBranch);
 
-                    currentBranch = new(count.ToString());
-                    currentBranch.transform.SetParent(previousBranch.transform, false);
-
+                    currentBranch = new(previousBranch, true);
                     break;
 
-                
+
             }
 
         }
@@ -205,4 +198,9 @@ public class L_System : MonoBehaviour
 
         }
     }
+
+    //private void OnDrawGizmos()
+    //{
+    //    Handles.Label(currentBranch.position, currentBranch.position.ToString());
+    //}
 }
