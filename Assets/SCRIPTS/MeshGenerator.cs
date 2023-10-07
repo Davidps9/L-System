@@ -1,28 +1,24 @@
-
-
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-public class MeshGenerator : MonoBehaviour
+//[RequireComponent(typeof(MeshFilter))]
+//[RequireComponent(typeof(MeshRenderer))]
+
+public static class MeshGenerator
 {
-    private Mesh mesh;
-    private List<Vector2> uvs = new List<Vector2>();
-    private List<Vector3> vertices = new List<Vector3>();
-    private List<int> triangles = new List<int>();
-    [SerializeField] int sideCount = 4;
-    [SerializeField] float radius = 4;
-
-    private void Start()
+    public static void GenerateVertex(this Branch branch, Node node, bool addCap)
     {
-        mesh = GetComponent<MeshFilter>().mesh;
-        //AssignDefaultShader();
+        GenerateVertex(branch.meshInfo, node, addCap);
     }
-
-    public void GenerateVertex(Node node, bool addCap)
+    public static void GenerateVertex(this MeshInfo meshInfo, Node node, bool addCap)
     {
+        // Extract info from MeshInfo
+        List<Vector3> vertices = meshInfo.vertices;
+        List<int> triangles = meshInfo.triangles;
+        //List<Vector2> uvs = meshInfo.uvs;
+        int sideCount = meshInfo.sideCount;
+        float radius = meshInfo.radius;
+
         Vector3 angleBetween = Vector3.zero;
         Vector3 localAngleBetween = Vector3.zero;
         if (node.parent != null)
@@ -39,7 +35,7 @@ public class MeshGenerator : MonoBehaviour
         //Debug.Log("local rotation: " + node.localRotation + ", scale: " + scale);
 
         vertices.Add(node.position);
-        uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
+        //uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
 
         int nodeIndex = vertices.IndexOf(node.position);
 
@@ -52,7 +48,7 @@ public class MeshGenerator : MonoBehaviour
             vertex = rotation * vertex;
             vertex += node.position;
             vertices.Add(vertex);
-            uvs.Add(new Vector2(vertex.x, vertex.z) * vertex.y);
+            //uvs.Add(new Vector2(vertex.x, vertex.z) * vertex.y);
         }
 
         if (addCap)
@@ -68,25 +64,26 @@ public class MeshGenerator : MonoBehaviour
         if (node.parent != null)
         {
             int parentIndex = vertices.IndexOf(node.parent.position);
-            CreateWalls(nodeIndex, parentIndex);
+            meshInfo.CreateWalls(nodeIndex, parentIndex);
         }
     }
 
+    //public void UpdateMesh()
+    //{
+    //    mesh.SetVertices(vertices);
+    //    mesh.SetTriangles(triangles, 0);
+    //    mesh.RecalculateBounds();
+    //    mesh.RecalculateTangents();
+    //    mesh.RecalculateNormals();
+    //    Unwrapping.GenerateSecondaryUVSet(mesh);
+    //    //Debug.Log(vertices.Count);
+    //}
 
-    public void UpdateMesh()
+    private static void CreateWalls(this MeshInfo meshInfo, int index, int prevIndex)
     {
-        mesh.SetVertices(vertices);
-        mesh.SetTriangles(triangles,0);
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
-        mesh.RecalculateNormals();
-        Unwrapping.GenerateSecondaryUVSet(mesh);
-        //Debug.Log(vertices.Count);
-    }
+        int size = meshInfo.sideCount;
+        List<int> triangles = meshInfo.triangles;
 
-    private void CreateWalls(int index, int prevIndex)
-    {
-        int size = sideCount;
         int bottomFirstIndex = prevIndex + 1;
         int topFirstIndex = index + 1;
 
@@ -108,30 +105,8 @@ public class MeshGenerator : MonoBehaviour
         }
     }
 
-    public void ResetMesh()
+    public static T Last<T>(this List<T> list)
     {
-        vertices.Clear();
-        triangles.Clear();
-        uvs.Clear();    
+        return list[list.Count - 1];
     }
-
-    //public void AssignDefaultShader()
-    //{
-    //    // white Diffuse shader, better than the default magenta
-    //    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-    //    meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-    //    meshRenderer.sharedMaterial.color = Color.white;
-    //}
-
-    //private void OnDrawGizmos()
-    //{
-    //    if (vertices.Count > 0)
-    //    {
-    //        Gizmos.color = Color.red;
-    //        for (int i = 0; i < vertices.Count; i++)
-    //        {
-    //            Gizmos.DrawSphere(vertices[i], 0.1f);
-    //        }
-    //    }
-    //}
 }

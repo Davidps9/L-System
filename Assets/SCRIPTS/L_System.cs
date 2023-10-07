@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshGenerator))]
 public class L_System : MonoBehaviour
 {
 
@@ -33,30 +31,21 @@ public class L_System : MonoBehaviour
      * '[': Set as child of previous object
      * ']': Go up 1 level in hierarchy
      * 
-     * FF+[+F-F-F]-[-F+F+F]
-     * F+F−F−F+F
-     * angulo 25
      * */
     [Header("L-System Parameters")]
-    [SerializeField] private string axiom;
-    [SerializeField] private Rule[] rules;
-    [SerializeField] private float rotationAngle;
-    private MeshGenerator meshGeneratorScript;
+    [SerializeField] private Ruleset ruleset;
 
-    [Serializable]
-    class Rule
-    {
-        public char originalCase;
-        public string conversion;
-    }
+    [Header("Rendering Parameters")]
+    [SerializeField] private float radius;
+    [SerializeField] private int sideCount;
+    [SerializeField] private Material material;
 
     private string sentence;
 
     void Start()
     {
-        sentence = axiom;
+        sentence = ruleset.axiom;
         //TurtleConversion();
-        meshGeneratorScript = GetComponent<MeshGenerator>();
     }
 
     private void TurtleConversion()
@@ -67,7 +56,7 @@ public class L_System : MonoBehaviour
 
             bool found = false;
 
-            foreach (Rule rule in rules)
+            foreach (Rule rule in ruleset.rules)
             {
                 if (word == rule.originalCase)
                 {
@@ -90,73 +79,103 @@ public class L_System : MonoBehaviour
 
     private IEnumerator CreateTree()
     {
-        List<Node> pushedBranches = new List<Node>();
-        Node previousBranch = new();
-        Node currentBranch = new(previousBranch);
+        List<Branch> pushedBranches = new List<Branch>();
+        Node previousNode = new();
+        Node currentNode = new(previousNode);
 
-        meshGeneratorScript.GenerateVertex(currentBranch, true);
+        Branch newBranch = CreateBranch(currentNode, transform, "Axiom");
+        pushedBranches.Add(newBranch);
+        newBranch.GenerateVertex(currentNode, true);
 
-        float xangle = 0;
+        // float xangle = 0;
         int count = 0;
         foreach (char word in sentence)
         {
             switch (word)
             {
                 case 'F':
-                    currentBranch.localPosition += Vector3.up * 2;
-                    meshGeneratorScript.GenerateVertex(currentBranch, false);
+                    currentNode.localPosition += Vector3.up * 2;
+                    pushedBranches.Last().GenerateVertex(currentNode, false);
 
-                    previousBranch = currentBranch;
-                    currentBranch = new(previousBranch, true);
+                    previousNode = currentNode;
+                    currentNode = new(previousNode, true);
                     break;
 
                 case 'Z':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
-                    currentBranch.localRotation += Vector3.forward * rotationAngle;
+                    currentNode.localRotation += Vector3.forward * ruleset.rotationAngle;
                     break;
 
                 case 'z':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
-                    currentBranch.localRotation += Vector3.back * rotationAngle;
+                    currentNode.localRotation += Vector3.back * ruleset.rotationAngle;
                     break;
 
                 case 'X':
-                    currentBranch.localRotation += Vector3.right * rotationAngle;
+                    currentNode.localRotation += Vector3.right * ruleset.rotationAngle;
                     break;
 
                 case 'x':
-                    currentBranch.localRotation += Vector3.left * rotationAngle;
+                    currentNode.localRotation += Vector3.left * ruleset.rotationAngle;
                     break;
 
                 case '[':
-                    pushedBranches.Add(currentBranch.parent);
-                    previousBranch = currentBranch;
+                    pushedBranches.Last().CreateMesh();
 
-                    currentBranch = new(previousBranch, true);
+                    Debug.Log("creanding new branch");
+                    newBranch = CreateBranch(currentNode, pushedBranches.Last().transform, "Branch from open");
+                    pushedBranches.Add(newBranch);
+
+                    previousNode = currentNode;
+
+                    currentNode = new(previousNode, true);
                     break;
 
                 case ']':
-                    previousBranch = pushedBranches[pushedBranches.Count - 1];
-                    pushedBranches.Remove(previousBranch);
+                    Debug.Log("acabanding new branch");
+                    pushedBranches.Last().CreateMesh();
+                    previousNode = pushedBranches.Last().rootNode;
+                    pushedBranches.RemoveAt(pushedBranches.Count - 1);
 
-                    meshGeneratorScript.GenerateVertex(currentBranch, true);
 
-                    currentBranch = new(previousBranch, true);
+                    // meshGeneratorScript.GenerateVertex(currentNode, true);
+
+                    currentNode = new(previousNode, true);
+
+                    newBranch = CreateBranch(currentNode, pushedBranches.Last().transform, "Branch from close");
+                    pushedBranches.Add(newBranch);
                     break;
             }
-
+            Debug.Log("Current Node " + count + ": " + currentNode.position);
             count++;
-            Debug.Log("Progress: " + 100.0f * count / sentence.Length + "%");
-            yield return new WaitForEndOfFrame();
+            //Debug.Log("Progress: " + 100.0f * count / sentence.Length + "%");
+            yield return new WaitForSeconds(1);
         }
-        meshGeneratorScript.UpdateMesh();
+        pushedBranches.Last().CreateMesh();
+    }
+
+    Branch CreateBranch(Node rootNode, Transform parent, string name = "Branch")
+    {
+        GameObject newBranch = new(name);
+        newBranch.transform.SetParent(parent);
+
+        newBranch.AddComponent<MeshFilter>();
+        newBranch.AddComponent<MeshRenderer>();
+        Branch newBranchScript = newBranch.AddComponent<Branch>();
+        newBranchScript.SetRootNode(rootNode);
+        newBranchScript.SetRenderParameters(sideCount, radius, material);
+        return newBranchScript;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            meshGeneratorScript.ResetMesh();
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+
             TurtleConversion();
             Debug.Log(sentence);
         }
