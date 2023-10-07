@@ -24,4 +24,25 @@ MonoBehaviour:
     conversion: Z
   - originalCase: 122
     conversion: X
-  rotationAngle: 25
+  words:
+  - character: 70
+    action: 0
+    value: 2
+  - character: 90
+    action: 1
+    value: 25
+  - character: 122
+    action: 2
+    value: 25
+  - character: 88
+    action: 3
+    value: 25
+  - character: 120
+    action: 4
+    value: 25
+  - character: 91
+    action: 5
+    value: 0
+  - character: 93
+    action: 6
+    value: 0

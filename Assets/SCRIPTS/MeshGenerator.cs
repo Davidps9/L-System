@@ -6,11 +6,22 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static void GenerateVertex(this Branch branch, Node node, bool addCap)
+    public static void GenerateMesh(this MeshInfo meshInfo, Node[] nodes)
     {
-        GenerateVertex(branch.meshInfo, node, addCap);
+        foreach (Node node in nodes)
+        {
+            GenerateVertex(ref meshInfo, node, false);
+        }
     }
-    public static void GenerateVertex(this MeshInfo meshInfo, Node node, bool addCap)
+    public static void GenerateMesh(this Branch branch)
+    {
+        foreach (Node node in branch.nodes)
+        {
+            GenerateVertex(ref branch.meshInfo, node, false);
+        }
+    }
+
+    private static void GenerateVertex(ref MeshInfo meshInfo, Node node, bool addCap)
     {
         // Extract info from MeshInfo
         List<Vector3> vertices = meshInfo.vertices;
@@ -25,6 +36,7 @@ public static class MeshGenerator
         {
             angleBetween = node.parent.rotation + ((node.rotation - node.parent.rotation) / 2);
             localAngleBetween = (angleBetween - node.parent.rotation);
+            Debug.Log("parent: " + node.parent.rotation + ", node: " + node.rotation + ", angle: " + angleBetween + ", local angle: " + localAngleBetween);
         }
 
         Vector2 scale = new Vector2(
@@ -64,7 +76,7 @@ public static class MeshGenerator
         if (node.parent != null)
         {
             int parentIndex = vertices.IndexOf(node.parent.position);
-            meshInfo.CreateWalls(nodeIndex, parentIndex);
+            CreateWalls(ref meshInfo, nodeIndex, parentIndex);
         }
     }
 
@@ -79,7 +91,7 @@ public static class MeshGenerator
     //    //Debug.Log(vertices.Count);
     //}
 
-    private static void CreateWalls(this MeshInfo meshInfo, int index, int prevIndex)
+    private static void CreateWalls(ref MeshInfo meshInfo, int index, int prevIndex)
     {
         int size = meshInfo.sideCount;
         List<int> triangles = meshInfo.triangles;
@@ -108,5 +120,10 @@ public static class MeshGenerator
     public static T Last<T>(this List<T> list)
     {
         return list[list.Count - 1];
+    }
+
+    public static T First<T>(this List<T> list)
+    {
+        return list[0];
     }
 }

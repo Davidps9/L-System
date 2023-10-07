@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -80,90 +81,103 @@ public class L_System : MonoBehaviour
     private IEnumerator CreateTree()
     {
         List<Branch> pushedBranches = new List<Branch>();
-        Node previousNode = new();
-        Node currentNode = new(previousNode);
+        //Node previousNode = new();
+        //Node currentNode = new(previousNode);
 
-        Branch newBranch = CreateBranch(currentNode, transform, "Axiom");
+        Branch newBranch = CreateBranch(transform, Node.Zero, "Axiom");
         pushedBranches.Add(newBranch);
-        newBranch.GenerateVertex(currentNode, true);
+        Node currentNode = null;
+        // newBranch.GenerateVertex(currentNode, true);
 
         // float xangle = 0;
         int count = 0;
         foreach (char word in sentence)
         {
-            switch (word)
+            yield return new WaitForSeconds(0.2f);
+
+            Word wordInfo = Array.Find(ruleset.words, w => w.character == word);
+            if (wordInfo == null)
             {
-                case 'F':
-                    currentNode.localPosition += Vector3.up * 2;
-                    pushedBranches.Last().GenerateVertex(currentNode, false);
+                Debug.LogError("Word not defined: " + word);
+                yield return 0;
+            }
 
-                    previousNode = currentNode;
-                    currentNode = new(previousNode, true);
+            if (currentNode == null)
+            {
+                currentNode = pushedBranches.Last().CreateNode();
+                Debug.Log("Current Node " + count + ": " + currentNode.position);
+            }
+
+            switch (wordInfo.action)
+            {
+                case RuleAction.MoveForward:
+                    currentNode.localPosition += Node.RotatedPosition(Vector3.up * wordInfo.value, currentNode.localRotation);
+                    //currentNode.localPosition += Vector3.up * wordInfo.value;
+                    pushedBranches.Last().ApplyNode(currentNode);
+
+                    currentNode = null;
+                    //currentNode = new(previousNode, true);
                     break;
 
-                case 'Z':
+                case RuleAction.RotateZPositive:
                     //xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
-                    currentNode.localRotation += Vector3.forward * ruleset.rotationAngle;
+                    currentNode.localRotation += Vector3.forward * wordInfo.value;
                     break;
 
-                case 'z':
+                case RuleAction.RotateZNegative:
                     //xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
-                    currentNode.localRotation += Vector3.back * ruleset.rotationAngle;
+                    currentNode.localRotation += Vector3.back * wordInfo.value;
                     break;
 
-                case 'X':
-                    currentNode.localRotation += Vector3.right * ruleset.rotationAngle;
+                case RuleAction.RotateXPositive:
+                    currentNode.localRotation += Vector3.right * wordInfo.value;
                     break;
 
-                case 'x':
-                    currentNode.localRotation += Vector3.left * ruleset.rotationAngle;
+                case RuleAction.RotateXNegative:
+                    currentNode.localRotation += Vector3.left * wordInfo.value;
                     break;
 
-                case '[':
+                case RuleAction.PushBranch:
                     pushedBranches.Last().CreateMesh();
 
                     Debug.Log("creanding new branch");
-                    newBranch = CreateBranch(currentNode, pushedBranches.Last().transform, "Branch from open");
+                    newBranch = CreateBranch(pushedBranches.Last().transform, currentNode, "Branch from open");
                     pushedBranches.Add(newBranch);
 
-                    previousNode = currentNode;
-
-                    currentNode = new(previousNode, true);
+                    currentNode = null;
                     break;
 
-                case ']':
+                case RuleAction.PopBranch:
                     Debug.Log("acabanding new branch");
                     pushedBranches.Last().CreateMesh();
-                    previousNode = pushedBranches.Last().rootNode;
-                    pushedBranches.RemoveAt(pushedBranches.Count - 1);
 
+                    //previousNode = pushedBranches.Last().rootNode;
+                    pushedBranches.RemoveAt(pushedBranches.Count - 1);
 
                     // meshGeneratorScript.GenerateVertex(currentNode, true);
 
-                    currentNode = new(previousNode, true);
+                    currentNode = null;
 
-                    newBranch = CreateBranch(currentNode, pushedBranches.Last().transform, "Branch from close");
-                    pushedBranches.Add(newBranch);
+                    //newBranch = CreateBranch(currentNode, pushedBranches.Last().transform, "Branch from close");
+                    //pushedBranches.Add(newBranch);
                     break;
             }
-            Debug.Log("Current Node " + count + ": " + currentNode.position);
+
             count++;
             //Debug.Log("Progress: " + 100.0f * count / sentence.Length + "%");
-            yield return new WaitForSeconds(1);
+
         }
         pushedBranches.Last().CreateMesh();
     }
 
-    Branch CreateBranch(Node rootNode, Transform parent, string name = "Branch")
+    Branch CreateBranch(Transform parent, Node rootNode, string name = "Branch")
     {
         GameObject newBranch = new(name);
-        newBranch.transform.SetParent(parent);
 
         newBranch.AddComponent<MeshFilter>();
         newBranch.AddComponent<MeshRenderer>();
         Branch newBranchScript = newBranch.AddComponent<Branch>();
-        newBranchScript.SetRootNode(rootNode);
-        newBranchScript.SetRenderParameters(sideCount, radius, material);
+        newBranchScript.Initialize(parent, rootNode, sideCount, radius, material);
         return newBranchScript;
     }
 

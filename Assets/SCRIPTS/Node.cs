@@ -93,10 +93,57 @@ public class Node
         return worldRotation - parent.rotation;
     }
 
-    Vector3 RotatedPosition(Vector3 position, Vector3 rotation)
+    public static Vector3 RotatedPosition(Vector3 position, Vector3 rotation)
     {
         Quaternion quaternion = Quaternion.Euler(rotation);
         Vector3 result = quaternion * position;
         return result;
+    }
+
+    public void SetParent(Node parent, bool keepWorldPosition)
+    {
+        this.parent = parent;
+        if (!keepWorldPosition)
+        {
+            localPosition = position;
+        }
+    }
+
+    public static Node Zero => new Node(Vector3.zero, Vector3.zero);
+}
+
+public static class NodeExtensions
+{
+    public static Node FromTransform(this Node node, Transform transform)
+    {
+        node.position = transform.position;
+        node.rotation = transform.rotation.eulerAngles;
+        return node;
+    }
+
+    public static Transform FromNode(this Transform transform, Node node)
+    {
+        transform.position = node.position;
+        transform.rotation = Quaternion.Euler(node.rotation);
+        return transform;
+    }
+
+    public static Node LocalFromTransform(this Node node, Transform transform)
+    {
+        node.localPosition = transform.localPosition;
+        node.localRotation = transform.localRotation.eulerAngles;
+        return node;
+    }
+
+    public static Transform LocalFromNode(this Transform transform, Node node)
+    {
+        transform.localPosition = node.localPosition;
+        transform.localRotation = Quaternion.Euler(node.localRotation);
+        return transform;
+    }
+
+    public static Node Clone(this Node node)
+    {
+        return new Node(node.position, node.rotation, node.parent);
     }
 }

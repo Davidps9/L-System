@@ -15,5 +15,14 @@ MonoBehaviour:
   axiom: F
   rules:
   - originalCase: 70
-    conversion: FZFzFzFZF
-  rotationAngle: 90
+    conversion: F+F-F-F+F
+  words:
+  - character: 70
+    action: 0
+    value: 2
+  - character: 43
+    action: 1
+    value: 90
+  - character: 45
+    action: 2
+    value: 90

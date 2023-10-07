@@ -6,7 +6,7 @@ public class Ruleset : ScriptableObject
 {
     public string axiom;
     public Rule[] rules;
-    public float rotationAngle;
+    public Word[] words;
 }
 
 [Serializable]
@@ -14,4 +14,23 @@ public class Rule
 {
     public char originalCase;
     public string conversion;
+}
+
+[Serializable]
+public class Word
+{
+    public char character;
+    public RuleAction action;
+    public float value;
+}
+
+public enum RuleAction
+{
+    MoveForward,
+    RotateZPositive,
+    RotateZNegative,
+    RotateXPositive,
+    RotateXNegative,
+    PushBranch,
+    PopBranch
 }

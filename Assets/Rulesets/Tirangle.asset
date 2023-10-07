@@ -10,19 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 562850115e6b519438ef9f36e54da3f6, type: 3}
-  m_Name: Coral 1
+  m_Name: Tirangle
   m_EditorClassIdentifier: 
-  axiom: F
+  axiom: A
   rules:
-  - originalCase: 70
-    conversion: FF[FFF][FFF]
+  - originalCase: 65
+    conversion: B-A-B
+  - originalCase: 66
+    conversion: A+B+A
   words:
-  - character: 70
+  - character: 65
     action: 0
     value: 2
-  - character: 91
-    action: 5
-    value: 0
-  - character: 93
-    action: 6
-    value: 0
+  - character: 66
+    action: 0
+    value: 2
+  - character: 43
+    action: 1
+    value: 60
+  - character: 45
+    action: 2
+    value: 60
