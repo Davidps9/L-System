@@ -158,7 +158,15 @@ MonoBehaviour:
   axiom: F
   rules:
   - originalCase: 70
-    conversion: FF+[+F-F-F]-[-F+F+F]
+    conversion: FFZ[ZFzFzF]z[zFZFZF]
+  - originalCase: 90
+    conversion: x
+  - originalCase: 122
+    conversion: X
+  - originalCase: 120
+    conversion: Z
+  - originalCase: 88
+    conversion: z
   rotationAngle: 25
 --- !u!4 &634008208
 Transform:
@@ -209,7 +217,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: eea8355132e5dc4438f496fb64ef7f4b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
