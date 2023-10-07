@@ -1,6 +1,7 @@
 
 
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -8,7 +9,7 @@ using UnityEngine;
 public class MeshGenerator : MonoBehaviour
 {
     private Mesh mesh;
-
+    private List<Vector2> uvs = new List<Vector2>();
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
     [SerializeField] int sideCount = 4;
@@ -38,6 +39,8 @@ public class MeshGenerator : MonoBehaviour
         //Debug.Log("local rotation: " + node.localRotation + ", scale: " + scale);
 
         vertices.Add(node.position);
+        uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
+
         int nodeIndex = vertices.IndexOf(node.position);
 
         Quaternion rotation = Quaternion.Euler(angleBetween.x, 0, angleBetween.z);
@@ -49,6 +52,7 @@ public class MeshGenerator : MonoBehaviour
             vertex = rotation * vertex;
             vertex += node.position;
             vertices.Add(vertex);
+            uvs.Add(new Vector2(vertex.x, vertex.z) * vertex.y);
         }
 
         if (addCap)
@@ -71,11 +75,12 @@ public class MeshGenerator : MonoBehaviour
 
     public void UpdateMesh()
     {
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles,0);
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
         mesh.RecalculateNormals();
+        Unwrapping.GenerateSecondaryUVSet(mesh);
         //Debug.Log(vertices.Count);
     }
 
@@ -107,6 +112,7 @@ public class MeshGenerator : MonoBehaviour
     {
         vertices.Clear();
         triangles.Clear();
+        uvs.Clear();    
     }
 
     //public void AssignDefaultShader()

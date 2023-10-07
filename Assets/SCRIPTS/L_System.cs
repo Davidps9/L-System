@@ -110,14 +110,22 @@ public class L_System : MonoBehaviour
                     currentBranch = new(previousBranch, true);
                     break;
 
-                case '+':
+                case 'Z':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
-                    currentBranch.localRotation += new Vector3(xangle, 0, rotationAngle);
+                    currentBranch.localRotation += Vector3.forward * rotationAngle;
                     break;
 
-                case '-':
+                case 'z':
                     //xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
-                    currentBranch.localRotation += new Vector3(xangle, 0, -rotationAngle);
+                    currentBranch.localRotation += Vector3.back * rotationAngle;
+                    break;
+
+                case 'X':
+                    currentBranch.localRotation += Vector3.right * rotationAngle;
+                    break;
+
+                case 'x':
+                    currentBranch.localRotation += Vector3.left * rotationAngle;
                     break;
 
                 case '[':

@@ -158,7 +158,15 @@ MonoBehaviour:
   axiom: F
   rules:
   - originalCase: 70
-    conversion: FF+[+F-F-F]-[-F+F+F]
+    conversion: FFZ[ZFzFzF]z[zFZFZF]
+  - originalCase: 90
+    conversion: x
+  - originalCase: 122
+    conversion: X
+  - originalCase: 120
+    conversion: Z
+  - originalCase: 88
+    conversion: z
   rotationAngle: 25
 --- !u!4 &634008208
 Transform:
