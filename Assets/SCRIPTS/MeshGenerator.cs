@@ -17,7 +17,7 @@ public class MeshGenerator : MonoBehaviour
     private void Start()
     {
         mesh = GetComponent<MeshFilter>().mesh;
-        AssignDefaultShader();
+        //AssignDefaultShader();
     }
 
     public void GenerateVertex(Node node, bool addCap)
@@ -109,13 +109,13 @@ public class MeshGenerator : MonoBehaviour
         triangles.Clear();
     }
 
-    public void AssignDefaultShader()
-    {
-        // white Diffuse shader, better than the default magenta
-        MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-        meshRenderer.sharedMaterial.color = Color.white;
-    }
+    //public void AssignDefaultShader()
+    //{
+    //    // white Diffuse shader, better than the default magenta
+    //    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+    //    meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
+    //    meshRenderer.sharedMaterial.color = Color.white;
+    //}
 
     //private void OnDrawGizmos()
     //{
