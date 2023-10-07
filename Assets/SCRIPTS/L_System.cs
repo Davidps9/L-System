@@ -91,8 +91,8 @@ public class L_System : MonoBehaviour
     private IEnumerator CreateTree()
     {
         List<Node> pushedBranches = new List<Node>();
-        Node currentBranch = new();
-        Node previousBranch;
+        Node previousBranch = new();
+        Node currentBranch = new(previousBranch);
 
         meshGeneratorScript.GenerateVertex(currentBranch, true);
 
@@ -130,6 +130,8 @@ public class L_System : MonoBehaviour
                 case ']':
                     previousBranch = pushedBranches[pushedBranches.Count - 1];
                     pushedBranches.Remove(previousBranch);
+
+                    meshGeneratorScript.GenerateVertex(currentBranch, true);
 
                     currentBranch = new(previousBranch, true);
                     break;
