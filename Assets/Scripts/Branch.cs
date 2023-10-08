@@ -35,7 +35,7 @@ public class Branch : MonoBehaviour
         }
         else
         {
-            joint.connectedAnchor = rootNode.position;
+            joint.connectedAnchor = transform.position;
         }
 
         Node newRootNode = new Node(Vector3.zero, rootNode.rotation);
