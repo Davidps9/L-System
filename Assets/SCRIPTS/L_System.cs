@@ -35,6 +35,7 @@ public class L_System : MonoBehaviour
      * */
     [Header("L-System Parameters")]
     [SerializeField] private Ruleset ruleset;
+    [SerializeField] private GameObject branchPrefab;
 
     [Header("Rendering Parameters")]
     [SerializeField] private float radius;
@@ -166,10 +167,16 @@ public class L_System : MonoBehaviour
 
     Branch CreateBranch(Transform parent, Node rootNode, string name = "Branch")
     {
-        GameObject newBranch = new(name);
-        Branch newBranchScript = newBranch.AddComponent<Branch>();
-        newBranchScript.Initialize(parent, rootNode);
-        return newBranchScript;
+        GameObject newBranch = Instantiate(branchPrefab);
+        newBranch.name = name;
+        if (newBranch.TryGetComponent<Branch>(out var branchScript))
+        {
+            branchScript.Initialize(parent, rootNode);
+            return branchScript;
+        }
+
+        Debug.LogError("The prefab does not have a Branch script attached to it.");
+        return null;
     }
 
     void Update()

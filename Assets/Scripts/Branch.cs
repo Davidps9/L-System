@@ -3,10 +3,14 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(HingeJoint))]
 public class Branch : MonoBehaviour
 {
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
+    private Rigidbody rb;
+    private HingeJoint joint;
     [HideInInspector] public List<Node> nodes = new();
     [HideInInspector] public Node lastNode => nodes.Last();
 
@@ -14,12 +18,24 @@ public class Branch : MonoBehaviour
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
+        rb = GetComponent<Rigidbody>();
+        joint = GetComponent<HingeJoint>();
 
         transform.SetParent(parent, false);
         transform.localPosition = rootNode.position;
-        transform.localRotation = Quaternion.Euler(rootNode.rotation);
+        //transform.localRotation = Quaternion.Euler(rootNode.rotation);
 
-        Node newRootNode = Node.Zero;
+        if (parent.TryGetComponent<Rigidbody>(out var parentRb))
+        {
+            joint.connectedBody = parentRb;
+            joint.autoConfigureConnectedAnchor = true;
+        }
+        else
+        {
+            joint.connectedAnchor = rootNode.position;
+        }
+
+        Node newRootNode = new Node(Vector3.zero, rootNode.rotation);
         newRootNode.radius = rootNode.radius;
         ApplyNode(newRootNode);
     }
@@ -34,6 +50,7 @@ public class Branch : MonoBehaviour
 
         meshRenderer.material = material;
         meshFilter.mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount, "Branch");
+        rb.isKinematic = false;
     }
 
     //public void SetRootNode(Node node)
