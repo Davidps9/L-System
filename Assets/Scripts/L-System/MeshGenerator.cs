@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-//[RequireComponent(typeof(MeshFilter))]
-//[RequireComponent(typeof(MeshRenderer))]
-
 public static class MeshGenerator
 {
     public static Mesh GenerateMesh(Node[] nodes, int sideCount, string name = "Mesh")

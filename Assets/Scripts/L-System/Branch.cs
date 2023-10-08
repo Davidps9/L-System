@@ -26,7 +26,6 @@ public class Branch : MonoBehaviour
 
         transform.SetParent(parent, false);
         transform.localPosition = rootNode.position;
-        //transform.localRotation = Quaternion.Euler(rootNode.rotation);
 
         if (parent.TryGetComponent<Rigidbody>(out var parentRb))
         {
@@ -59,14 +58,6 @@ public class Branch : MonoBehaviour
         rb.isKinematic = false;
     }
 
-    //public void SetRootNode(Node node)
-    //{
-    //    rootNode = node;
-    //    transform.position = node.position;
-    //    transform.rotation = Quaternion.Euler(node.rotation);
-    //    // meshInfo.GenerateVertex(node, false);
-    //}
-
     public Node CreateNode(float radius)
     {
         Node node = new(lastNode, true, radius);
@@ -79,16 +70,16 @@ public class Branch : MonoBehaviour
         nodes.Add(node);
     }
 
-    private void OnDrawGizmos()
-    {
-        if (nodes.Count > 0)
-        {
-            Gizmos.color = Color.red;
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                Gizmos.DrawSphere(nodes[i].position, 0.1f);
-                Gizmos.DrawMesh(meshFilter.mesh);
-            }
-        }
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    if (nodes.Count > 0)
+    //    {
+    //        Gizmos.color = Color.red;
+    //        for (int i = 0; i < nodes.Count; i++)
+    //        {
+    //            Gizmos.DrawSphere(nodes[i].position, 0.1f);
+    //            Gizmos.DrawMesh(meshFilter.mesh);
+    //        }
+    //    }
+    //}
 }
