@@ -113,12 +113,23 @@ public class Node
     }
 
     public static Node Zero => new Node(Vector3.zero, Vector3.zero);
+
+    public static Node FromTransform(Transform transform)
+    {
+        return NodeExtensions.FromTransform(transform);
+    }
+
+    public static Node LocalFromTransform(Transform transform)
+    {
+        return NodeExtensions.LocalFromTransform(transform);
+    }
 }
 
 public static class NodeExtensions
 {
-    public static Node FromTransform(this Node node, Transform transform)
+    public static Node FromTransform(Transform transform)
     {
+        Node node = new();
         node.position = transform.position;
         node.rotation = transform.rotation.eulerAngles;
         return node;
@@ -131,8 +142,9 @@ public static class NodeExtensions
         return transform;
     }
 
-    public static Node LocalFromTransform(this Node node, Transform transform)
+    public static Node LocalFromTransform(Transform transform)
     {
+        Node node = new();
         node.localPosition = transform.localPosition;
         node.localRotation = transform.localRotation.eulerAngles;
         return node;

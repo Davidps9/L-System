@@ -15,9 +15,9 @@ public class Branch : MonoBehaviour
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
 
-        transform.SetParent(parent);
-        transform.position = rootNode.position;
-        transform.rotation = Quaternion.Euler(rootNode.rotation);
+        transform.SetParent(parent, false);
+        transform.localPosition = rootNode.position;
+        transform.localRotation = Quaternion.Euler(rootNode.rotation);
 
         Node newRootNode = Node.Zero;
         newRootNode.radius = rootNode.radius;

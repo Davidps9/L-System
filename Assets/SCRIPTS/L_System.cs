@@ -89,11 +89,10 @@ public class L_System : MonoBehaviour
         pushedBranches.Add(newBranch);
         currentNode = null;
 
-        // float xangle = 0;
         int count = 0;
         foreach (char word in sentence)
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForEndOfFrame();
 
             Word wordInfo = Array.Find(ruleset.words, w => w.character == word);
             if (wordInfo == null)
@@ -105,27 +104,22 @@ public class L_System : MonoBehaviour
             if (currentNode == null)
             {
                 currentNode = pushedBranches.Last().CreateNode(radius);
-                Debug.Log("Current Node " + count + ": " + currentNode.position);
             }
 
             switch (wordInfo.action)
             {
                 case RuleAction.MoveForward:
                     currentNode.localPosition += Node.RotatedPosition(Vector3.up * wordInfo.value, currentNode.localRotation);
-                    //currentNode.localPosition += Vector3.up * wordInfo.value;
                     pushedBranches.Last().ApplyNode(currentNode);
 
                     currentNode = null;
-                    //currentNode = new(previousNode, true);
                     break;
 
                 case RuleAction.RotateZPositive:
-                    //xangle = Mathf.Round(UnityEngine.Random.Range(rotationAngle/2, -rotationAngle / 2));
                     currentNode.localRotation += Vector3.forward * wordInfo.value;
                     break;
 
                 case RuleAction.RotateZNegative:
-                    //xangle = Mathf.Round(UnityEngine.Random.Range(-rotationAngle / 2, rotationAngle / 2 ));
                     currentNode.localRotation += Vector3.back * wordInfo.value;
                     break;
 
@@ -140,15 +134,15 @@ public class L_System : MonoBehaviour
                 case RuleAction.PushBranch:
                     pushedBranches.Last().CreateMesh(sideCount, material);
 
-                    Debug.Log("creanding new branch");
-                    newBranch = CreateBranch(pushedBranches.Last().transform, currentNode, "Branch from open");
+                    Debug.Log("creanding branch " + (pushedBranches.Count + 1));
+                    newBranch = CreateBranch(pushedBranches.Last().transform, currentNode, "Branch lvl " + (pushedBranches.Count + 1));
                     pushedBranches.Add(newBranch);
 
                     currentNode = null;
                     break;
 
                 case RuleAction.PopBranch:
-                    Debug.Log("acabanding new branch");
+                    Debug.Log("Ending branch " + pushedBranches.Count);
                     pushedBranches.Last().CreateMesh(sideCount, material);
 
                     //previousNode = pushedBranches.Last().rootNode;

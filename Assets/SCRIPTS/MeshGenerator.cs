@@ -14,7 +14,7 @@ public static class MeshGenerator
 
         for (int i = 0; i < nodes.Length; i++)
         {
-            Vector3 angleBetween = Vector3.zero;
+            Vector3 angleBetween = nodes[i].rotation;
             Vector3 localAngleBetween = Vector3.zero;
 
 
@@ -22,7 +22,6 @@ public static class MeshGenerator
             {
                 angleBetween = nodes[i].rotation + ((nodes[i + 1].rotation - nodes[i].rotation) / 2);
                 localAngleBetween = (angleBetween - nodes[i].rotation);
-                Debug.Log("parent: " + nodes[i].rotation + ", node: " + nodes[i].rotation + ", angle: " + angleBetween + ", local angle: " + localAngleBetween);
             }
 
             Vector2 scale = new Vector2(
