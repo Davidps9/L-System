@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 634008208}
   - component: {fileID: 634008207}
   m_Layer: 3
-  m_Name: L_System
+  m_Name: L-System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
