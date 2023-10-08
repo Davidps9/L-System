@@ -33,7 +33,7 @@ public class Branch : MonoBehaviour
         }
 
         meshRenderer.material = material;
-        meshFilter.mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount);
+        meshFilter.mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount, "Branch");
     }
 
     //public void SetRootNode(Node node)

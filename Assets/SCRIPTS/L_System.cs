@@ -167,9 +167,6 @@ public class L_System : MonoBehaviour
     Branch CreateBranch(Transform parent, Node rootNode, string name = "Branch")
     {
         GameObject newBranch = new(name);
-
-        newBranch.AddComponent<MeshFilter>();
-        newBranch.AddComponent<MeshRenderer>();
         Branch newBranchScript = newBranch.AddComponent<Branch>();
         newBranchScript.Initialize(parent, rootNode);
         return newBranchScript;

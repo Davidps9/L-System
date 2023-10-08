@@ -7,7 +7,7 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static Mesh GenerateMesh(Node[] nodes, int sideCount)
+    public static Mesh GenerateMesh(Node[] nodes, int sideCount, string name = "Mesh")
     {
         MeshInfo meshInfo = new();
         meshInfo.sideCount = sideCount;
@@ -38,7 +38,7 @@ public static class MeshGenerator
             }
         }
 
-        return meshInfo.CreateMesh();
+        return meshInfo.CreateMesh(name);
     }
 
     private static int CreateVertex(this MeshInfo meshInfo, Vector3 position, Vector3 rotation, Vector2 scale, bool addCap = false)
@@ -104,9 +104,10 @@ public static class MeshGenerator
         }
     }
 
-    private static Mesh CreateMesh(this MeshInfo meshInfo)
+    private static Mesh CreateMesh(this MeshInfo meshInfo, string name)
     {
         Mesh mesh = new();
+        mesh.name = name;
         mesh.SetVertices(meshInfo.vertices);
         mesh.SetTriangles(meshInfo.triangles, 0);
         mesh.RecalculateBounds();
