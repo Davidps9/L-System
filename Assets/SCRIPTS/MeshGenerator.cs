@@ -30,36 +30,25 @@ public static class MeshGenerator
                 Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad)
             );
 
-            int nodeIndex = meshInfo.GenerateVertex(nodes[i].position, angleBetween, scale, (i == 0 || i == nodes.Length - 1));
+            int vertexIndex = meshInfo.CreateVertex(nodes[i].position, angleBetween, scale, (i == 0 || i == nodes.Length - 1));
 
             if (nodes[i].parent != null)
             {
-                int parentIndex = meshInfo.vertices.IndexOf(nodes[i].parent.position);
-                CreateWalls(ref meshInfo, nodeIndex, parentIndex);
+                int parentVertexIndex = meshInfo.vertices.IndexOf(nodes[i].parent.position);
+                meshInfo.CreateWalls(vertexIndex, parentVertexIndex);
             }
         }
 
-        Mesh mesh = new();
-        mesh.SetVertices(meshInfo.vertices);
-        mesh.SetTriangles(meshInfo.triangles, 0);
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
-        mesh.RecalculateNormals();
-        Unwrapping.GenerateSecondaryUVSet(mesh);
-
-        //Debug.Log(mesh.vertices.Length);
-        return mesh;
+        return meshInfo.CreateMesh();
     }
 
-    private static int GenerateVertex(this MeshInfo meshInfo, Vector3 position, Vector3 rotation, Vector2 scale, bool addCap = false)
+    private static int CreateVertex(this MeshInfo meshInfo, Vector3 position, Vector3 rotation, Vector2 scale, bool addCap = false)
     {
         // Extract info from MeshInfo
         List<Vector3> vertices = meshInfo.vertices;
         List<int> triangles = meshInfo.triangles;
         //List<Vector2> uvs = meshInfo.uvs;
         int sideCount = meshInfo.sideCount;
-
-        //Debug.Log("local rotation: " + node.localRotation + ", scale: " + scale);
 
         vertices.Add(position);
         //uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
@@ -90,18 +79,7 @@ public static class MeshGenerator
         return nodeIndex;
     }
 
-    //public void UpdateMesh()
-    //{
-    //    mesh.SetVertices(vertices);
-    //    mesh.SetTriangles(triangles, 0);
-    //    mesh.RecalculateBounds();
-    //    mesh.RecalculateTangents();
-    //    mesh.RecalculateNormals();
-    //    Unwrapping.GenerateSecondaryUVSet(mesh);
-    //    //Debug.Log(vertices.Count);
-    //}
-
-    private static void CreateWalls(ref MeshInfo meshInfo, int index, int prevIndex)
+    private static void CreateWalls(this MeshInfo meshInfo, int index, int prevIndex)
     {
         int size = meshInfo.sideCount;
         List<int> triangles = meshInfo.triangles;
@@ -127,13 +105,25 @@ public static class MeshGenerator
         }
     }
 
-    public static T Last<T>(this List<T> list)
+    private static Mesh CreateMesh(this MeshInfo meshInfo)
     {
-        return list[list.Count - 1];
+        Mesh mesh = new();
+        mesh.SetVertices(meshInfo.vertices);
+        mesh.SetTriangles(meshInfo.triangles, 0);
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+        mesh.RecalculateNormals();
+        Unwrapping.GenerateSecondaryUVSet(mesh);
+
+        return mesh;
     }
 
-    public static T First<T>(this List<T> list)
+    private class MeshInfo
     {
-        return list[0];
+        public List<Vector3> vertices = new List<Vector3>();
+        public List<int> triangles = new List<int>();
+        public List<Vector3> normals = new List<Vector3>();
+        public List<Vector2> uvs = new List<Vector2>();
+        public int sideCount = 3;
     }
 }
