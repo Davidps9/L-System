@@ -27,7 +27,7 @@ MonoBehaviour:
   words:
   - character: 70
     action: 0
-    value: 2
+    value: 5
   - character: 90
     action: 1
     value: 25

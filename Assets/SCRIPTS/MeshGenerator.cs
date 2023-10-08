@@ -12,9 +12,31 @@ public static class MeshGenerator
         MeshInfo meshInfo = new();
         meshInfo.sideCount = sideCount;
 
-        foreach (Node node in nodes)
+        for (int i = 0; i < nodes.Length; i++)
         {
-            meshInfo.GenerateVertex(node, false);
+            Vector3 angleBetween = Vector3.zero;
+            Vector3 localAngleBetween = Vector3.zero;
+
+
+            if (i + 1 < nodes.Length)
+            {
+                angleBetween = nodes[i].rotation + ((nodes[i + 1].rotation - nodes[i].rotation) / 2);
+                localAngleBetween = (angleBetween - nodes[i].rotation);
+                Debug.Log("parent: " + nodes[i].rotation + ", node: " + nodes[i].rotation + ", angle: " + angleBetween + ", local angle: " + localAngleBetween);
+            }
+
+            Vector2 scale = new Vector2(
+                Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad),
+                Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad)
+            );
+
+            int nodeIndex = meshInfo.GenerateVertex(nodes[i].position, angleBetween, scale, (i == 0 || i == nodes.Length - 1));
+
+            if (nodes[i].parent != null)
+            {
+                int parentIndex = meshInfo.vertices.IndexOf(nodes[i].parent.position);
+                CreateWalls(ref meshInfo, nodeIndex, parentIndex);
+            }
         }
 
         Mesh mesh = new();
@@ -29,50 +51,32 @@ public static class MeshGenerator
         return mesh;
     }
 
-    private static void GenerateVertex(this MeshInfo meshInfo, Node node, bool addCap)
+    private static int GenerateVertex(this MeshInfo meshInfo, Vector3 position, Vector3 rotation, Vector2 scale, bool addCap = false)
     {
         // Extract info from MeshInfo
         List<Vector3> vertices = meshInfo.vertices;
         List<int> triangles = meshInfo.triangles;
         //List<Vector2> uvs = meshInfo.uvs;
         int sideCount = meshInfo.sideCount;
-        float radius = node.radius;
-
-        Debug.Log("radius: " + radius);
-
-        Vector3 angleBetween = Vector3.zero;
-        Vector3 localAngleBetween = Vector3.zero;
-        if (node.parent != null)
-        {
-            angleBetween = node.parent.rotation + ((node.rotation - node.parent.rotation) / 2);
-            localAngleBetween = (angleBetween - node.parent.rotation);
-            Debug.Log("parent: " + node.parent.rotation + ", node: " + node.rotation + ", angle: " + angleBetween + ", local angle: " + localAngleBetween);
-        }
-
-        Vector2 scale = new Vector2(
-            Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad),
-            Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad)
-        );
 
         //Debug.Log("local rotation: " + node.localRotation + ", scale: " + scale);
 
-        vertices.Add(node.position);
+        vertices.Add(position);
         //uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
 
-        int nodeIndex = vertices.IndexOf(node.position);
-
-        Quaternion rotation = Quaternion.Euler(angleBetween.x, 0, angleBetween.z);
+        Quaternion rotationQuaternion = Quaternion.Euler(rotation.x, 0, rotation.z);
         for (int i = 0; i < sideCount; i++)
         {
             float baseAngle = Mathf.PI * 2 * i / sideCount;
 
-            Vector3 vertex = new Vector3(radius * Mathf.Sin(baseAngle) * scale.y, 0, radius * Mathf.Cos(baseAngle) * scale.x);
-            vertex = rotation * vertex;
-            vertex += node.position;
+            Vector3 vertex = new Vector3(Mathf.Sin(baseAngle) * scale.y, 0, Mathf.Cos(baseAngle) * scale.x);
+            vertex = rotationQuaternion * vertex;
+            vertex += position;
             vertices.Add(vertex);
             //uvs.Add(new Vector2(vertex.x, vertex.z) * vertex.y);
         }
 
+        int nodeIndex = vertices.IndexOf(position);
         if (addCap)
         {
             for (int i = 0; i < sideCount; i++)
@@ -83,11 +87,7 @@ public static class MeshGenerator
             }
         }
 
-        if (node.parent != null)
-        {
-            int parentIndex = vertices.IndexOf(node.parent.position);
-            CreateWalls(ref meshInfo, nodeIndex, parentIndex);
-        }
+        return nodeIndex;
     }
 
     //public void UpdateMesh()
