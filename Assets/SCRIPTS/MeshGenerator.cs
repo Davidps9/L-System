@@ -1,60 +1,70 @@
-
-
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-public class MeshGenerator : MonoBehaviour
+//[RequireComponent(typeof(MeshFilter))]
+//[RequireComponent(typeof(MeshRenderer))]
+
+public static class MeshGenerator
 {
-    private Mesh mesh;
-    private List<Vector2> uvs = new List<Vector2>();
-    private List<Vector3> vertices = new List<Vector3>();
-    private List<int> triangles = new List<int>();
-    [SerializeField] int sideCount = 4;
-    [SerializeField] float radius = 4;
-
-    private void Start()
+    public static Mesh GenerateMesh(Node[] nodes, int sideCount)
     {
-        mesh = GetComponent<MeshFilter>().mesh;
-        //AssignDefaultShader();
-    }
+        MeshInfo meshInfo = new();
+        meshInfo.sideCount = sideCount;
 
-    public void GenerateVertex(Node node, bool addCap)
-    {
-        Vector3 angleBetween = Vector3.zero;
-        Vector3 localAngleBetween = Vector3.zero;
-        if (node.parent != null)
+        for (int i = 0; i < nodes.Length; i++)
         {
-            angleBetween = node.parent.rotation + ((node.rotation - node.parent.rotation) / 2);
-            localAngleBetween = (angleBetween - node.parent.rotation);
+            Vector3 angleBetween = nodes[i].rotation;
+            Vector3 localAngleBetween = Vector3.zero;
+
+
+            if (i + 1 < nodes.Length)
+            {
+                angleBetween = nodes[i].rotation + ((nodes[i + 1].rotation - nodes[i].rotation) / 2);
+                localAngleBetween = (angleBetween - nodes[i].rotation);
+            }
+
+            Vector2 scale = new Vector2(
+                Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad),
+                Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad)
+            );
+
+            int vertexIndex = meshInfo.CreateVertex(nodes[i].position, angleBetween, scale, (i == 0 || i == nodes.Length - 1));
+
+            if (nodes[i].parent != null)
+            {
+                int parentVertexIndex = meshInfo.vertices.IndexOf(nodes[i].parent.position);
+                meshInfo.CreateWalls(vertexIndex, parentVertexIndex);
+            }
         }
 
-        Vector2 scale = new Vector2(
-            Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.x * Mathf.Deg2Rad),
-            Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad)
-        );
+        return meshInfo.CreateMesh();
+    }
 
-        //Debug.Log("local rotation: " + node.localRotation + ", scale: " + scale);
+    private static int CreateVertex(this MeshInfo meshInfo, Vector3 position, Vector3 rotation, Vector2 scale, bool addCap = false)
+    {
+        // Extract info from MeshInfo
+        List<Vector3> vertices = meshInfo.vertices;
+        List<int> triangles = meshInfo.triangles;
+        //List<Vector2> uvs = meshInfo.uvs;
+        int sideCount = meshInfo.sideCount;
 
-        vertices.Add(node.position);
-        uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
+        vertices.Add(position);
+        //uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
 
-        int nodeIndex = vertices.IndexOf(node.position);
-
-        Quaternion rotation = Quaternion.Euler(angleBetween.x, 0, angleBetween.z);
+        Quaternion rotationQuaternion = Quaternion.Euler(rotation.x, 0, rotation.z);
         for (int i = 0; i < sideCount; i++)
         {
             float baseAngle = Mathf.PI * 2 * i / sideCount;
 
-            Vector3 vertex = new Vector3(radius * Mathf.Sin(baseAngle) * scale.y, 0, radius * Mathf.Cos(baseAngle) * scale.x);
-            vertex = rotation * vertex;
-            vertex += node.position;
+            Vector3 vertex = new Vector3(Mathf.Sin(baseAngle) * scale.y, 0, Mathf.Cos(baseAngle) * scale.x);
+            vertex = rotationQuaternion * vertex;
+            vertex += position;
             vertices.Add(vertex);
-            uvs.Add(new Vector2(vertex.x, vertex.z) * vertex.y);
+            //uvs.Add(new Vector2(vertex.x, vertex.z) * vertex.y);
         }
 
+        int nodeIndex = vertices.IndexOf(position);
         if (addCap)
         {
             for (int i = 0; i < sideCount; i++)
@@ -65,28 +75,14 @@ public class MeshGenerator : MonoBehaviour
             }
         }
 
-        if (node.parent != null)
-        {
-            int parentIndex = vertices.IndexOf(node.parent.position);
-            CreateWalls(nodeIndex, parentIndex);
-        }
+        return nodeIndex;
     }
 
-
-    public void UpdateMesh()
+    private static void CreateWalls(this MeshInfo meshInfo, int index, int prevIndex)
     {
-        mesh.SetVertices(vertices);
-        mesh.SetTriangles(triangles,0);
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
-        mesh.RecalculateNormals();
-        Unwrapping.GenerateSecondaryUVSet(mesh);
-        //Debug.Log(vertices.Count);
-    }
+        int size = meshInfo.sideCount;
+        List<int> triangles = meshInfo.triangles;
 
-    private void CreateWalls(int index, int prevIndex)
-    {
-        int size = sideCount;
         int bottomFirstIndex = prevIndex + 1;
         int topFirstIndex = index + 1;
 
@@ -108,30 +104,25 @@ public class MeshGenerator : MonoBehaviour
         }
     }
 
-    public void ResetMesh()
+    private static Mesh CreateMesh(this MeshInfo meshInfo)
     {
-        vertices.Clear();
-        triangles.Clear();
-        uvs.Clear();    
+        Mesh mesh = new();
+        mesh.SetVertices(meshInfo.vertices);
+        mesh.SetTriangles(meshInfo.triangles, 0);
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+        mesh.RecalculateNormals();
+        Unwrapping.GenerateSecondaryUVSet(mesh);
+
+        return mesh;
     }
 
-    //public void AssignDefaultShader()
-    //{
-    //    // white Diffuse shader, better than the default magenta
-    //    MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-    //    meshRenderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-    //    meshRenderer.sharedMaterial.color = Color.white;
-    //}
-
-    //private void OnDrawGizmos()
-    //{
-    //    if (vertices.Count > 0)
-    //    {
-    //        Gizmos.color = Color.red;
-    //        for (int i = 0; i < vertices.Count; i++)
-    //        {
-    //            Gizmos.DrawSphere(vertices[i], 0.1f);
-    //        }
-    //    }
-    //}
+    private class MeshInfo
+    {
+        public List<Vector3> vertices = new List<Vector3>();
+        public List<int> triangles = new List<int>();
+        public List<Vector3> normals = new List<Vector3>();
+        public List<Vector2> uvs = new List<Vector2>();
+        public int sideCount = 3;
+    }
 }

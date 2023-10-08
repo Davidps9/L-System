@@ -55,8 +55,9 @@ public class Node
     }
     public Vector3 rotation;
     public Node parent;
+    public float radius;
 
-    public Node(Vector3 position, Vector3 rotation, Node parent = null, bool isLocalPosition = false)
+    public Node(Vector3 position, Vector3 rotation, Node parent = null, bool isLocalPosition = false, float radius = 1)
     {
         this.parent = parent;
 
@@ -70,8 +71,10 @@ public class Node
             this.position = position;
             this.rotation = rotation;
         }
+
+        this.radius = radius;
     }
-    public Node(Node _parent = null, bool isLocalPosition = false) : this(Vector3.zero, Vector3.zero, _parent, isLocalPosition) { }
+    public Node(Node _parent = null, bool isLocalPosition = false, float radius = 1) : this(Vector3.zero, Vector3.zero, _parent, isLocalPosition, radius) { }
 
     Vector3 LocalToWorldPosition(Vector3 localPosition)
     {
@@ -93,10 +96,69 @@ public class Node
         return worldRotation - parent.rotation;
     }
 
-    Vector3 RotatedPosition(Vector3 position, Vector3 rotation)
+    public static Vector3 RotatedPosition(Vector3 position, Vector3 rotation)
     {
         Quaternion quaternion = Quaternion.Euler(rotation);
         Vector3 result = quaternion * position;
         return result;
+    }
+
+    public void SetParent(Node parent, bool keepWorldPosition)
+    {
+        this.parent = parent;
+        if (!keepWorldPosition)
+        {
+            localPosition = position;
+        }
+    }
+
+    public static Node Zero => new Node(Vector3.zero, Vector3.zero);
+
+    public static Node FromTransform(Transform transform)
+    {
+        return NodeExtensions.FromTransform(transform);
+    }
+
+    public static Node LocalFromTransform(Transform transform)
+    {
+        return NodeExtensions.LocalFromTransform(transform);
+    }
+}
+
+public static class NodeExtensions
+{
+    public static Node FromTransform(Transform transform)
+    {
+        Node node = new();
+        node.position = transform.position;
+        node.rotation = transform.rotation.eulerAngles;
+        return node;
+    }
+
+    public static Transform FromNode(this Transform transform, Node node)
+    {
+        transform.position = node.position;
+        transform.rotation = Quaternion.Euler(node.rotation);
+        return transform;
+    }
+
+    public static Node LocalFromTransform(Transform transform)
+    {
+        Node node = new();
+        node.localPosition = transform.localPosition;
+        node.localRotation = transform.localRotation.eulerAngles;
+        return node;
+    }
+
+    public static Transform LocalFromNode(this Transform transform, Node node)
+    {
+        transform.localPosition = node.localPosition;
+        transform.localRotation = Quaternion.Euler(node.localRotation);
+        return transform;
+    }
+
+    public static Node Clone(this Node node)
+    {
+        return new Node(node.position, node.rotation, node.parent);
     }
 }
