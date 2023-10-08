@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac5f3516a40b140448d662d673256186, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ruleset: {fileID: 11400000, guid: 68307fe344febae4488ddeca0fc6e272, type: 2}
+  ruleset: {fileID: 11400000, guid: 5be0a75beccafee488f2f321f72afa2c, type: 2}
   branchPrefab: {fileID: 2392352463464731594, guid: 61284f93e0f82dd4fa58ccbf55188e39,
     type: 3}
   radius: 0.5
@@ -475,7 +475,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 32bf81c3195edba40a949d722b05eede, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

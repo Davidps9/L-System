@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 562850115e6b519438ef9f36e54da3f6, type: 3}
+  m_Name: Weed
+  m_EditorClassIdentifier: 
+  axiom: F
+  rules:
+  - originalCase: 0
+    conversion: FF-[XY]+[XY]
+  words:
+  - character: 88
+    action: 0
+    value: 1
+  - character: 89
+    action: 0
+    value: 1
+  - character: 70
+    action: 0
+    value: 1
+  - character: 43
+    action: 1
+    value: 22.5
+  - character: 45
+    action: 2
+    value: 22.5
