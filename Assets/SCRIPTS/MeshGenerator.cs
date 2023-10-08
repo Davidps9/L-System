@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 //[RequireComponent(typeof(MeshFilter))]
@@ -6,29 +7,38 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static void GenerateMesh(this MeshInfo meshInfo, Node[] nodes)
+    public static Mesh GenerateMesh(Node[] nodes, int sideCount)
     {
+        MeshInfo meshInfo = new();
+        meshInfo.sideCount = sideCount;
+
         foreach (Node node in nodes)
         {
-            GenerateVertex(ref meshInfo, node, false);
+            meshInfo.GenerateVertex(node, false);
         }
-    }
-    public static void GenerateMesh(this Branch branch)
-    {
-        foreach (Node node in branch.nodes)
-        {
-            GenerateVertex(ref branch.meshInfo, node, false);
-        }
+
+        Mesh mesh = new();
+        mesh.SetVertices(meshInfo.vertices);
+        mesh.SetTriangles(meshInfo.triangles, 0);
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+        mesh.RecalculateNormals();
+        Unwrapping.GenerateSecondaryUVSet(mesh);
+
+        //Debug.Log(mesh.vertices.Length);
+        return mesh;
     }
 
-    private static void GenerateVertex(ref MeshInfo meshInfo, Node node, bool addCap)
+    private static void GenerateVertex(this MeshInfo meshInfo, Node node, bool addCap)
     {
         // Extract info from MeshInfo
         List<Vector3> vertices = meshInfo.vertices;
         List<int> triangles = meshInfo.triangles;
         //List<Vector2> uvs = meshInfo.uvs;
         int sideCount = meshInfo.sideCount;
-        float radius = meshInfo.radius;
+        float radius = node.radius;
+
+        Debug.Log("radius: " + radius);
 
         Vector3 angleBetween = Vector3.zero;
         Vector3 localAngleBetween = Vector3.zero;

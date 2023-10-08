@@ -55,8 +55,9 @@ public class Node
     }
     public Vector3 rotation;
     public Node parent;
+    public float radius;
 
-    public Node(Vector3 position, Vector3 rotation, Node parent = null, bool isLocalPosition = false)
+    public Node(Vector3 position, Vector3 rotation, Node parent = null, bool isLocalPosition = false, float radius = 1)
     {
         this.parent = parent;
 
@@ -70,8 +71,10 @@ public class Node
             this.position = position;
             this.rotation = rotation;
         }
+
+        this.radius = radius;
     }
-    public Node(Node _parent = null, bool isLocalPosition = false) : this(Vector3.zero, Vector3.zero, _parent, isLocalPosition) { }
+    public Node(Node _parent = null, bool isLocalPosition = false, float radius = 1) : this(Vector3.zero, Vector3.zero, _parent, isLocalPosition, radius) { }
 
     Vector3 LocalToWorldPosition(Vector3 localPosition)
     {

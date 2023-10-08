@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -10,24 +9,22 @@ public class Branch : MonoBehaviour
     private MeshRenderer meshRenderer;
     [HideInInspector] public List<Node> nodes = new();
     [HideInInspector] public Node lastNode => nodes.Last();
-    [HideInInspector] public MeshInfo meshInfo = new();
 
-    public void Initialize(Transform parent, Node rootNode, int sideCount, float radius, Material material)
+    public void Initialize(Transform parent, Node rootNode)
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
 
-        meshInfo.sideCount = sideCount;
-        meshInfo.radius = radius;
-        meshRenderer.material = material;
-
         transform.SetParent(parent);
         transform.position = rootNode.position;
         transform.rotation = Quaternion.Euler(rootNode.rotation);
-        ApplyNode(Node.Zero);
+
+        Node newRootNode = Node.Zero;
+        newRootNode.radius = rootNode.radius;
+        ApplyNode(newRootNode);
     }
 
-    public void CreateMesh()
+    public void CreateMesh(int sideCount, Material material)
     {
         if (nodes.Count < 1)
         {
@@ -35,18 +32,8 @@ public class Branch : MonoBehaviour
             return;
         }
 
-        meshInfo.GenerateMesh(nodes.ToArray());
-
-        Mesh mesh = new();
-        mesh.SetVertices(meshInfo.vertices);
-        mesh.SetTriangles(meshInfo.triangles, 0);
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
-        mesh.RecalculateNormals();
-        Debug.Log(mesh.vertices.Length);
-        Unwrapping.GenerateSecondaryUVSet(mesh);
-
-        meshFilter.mesh = mesh;
+        meshRenderer.material = material;
+        meshFilter.mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount);
     }
 
     //public void SetRootNode(Node node)
@@ -57,9 +44,9 @@ public class Branch : MonoBehaviour
     //    // meshInfo.GenerateVertex(node, false);
     //}
 
-    public Node CreateNode()
+    public Node CreateNode(float radius)
     {
-        Node node = new(lastNode, true);
+        Node node = new(lastNode, true, radius);
         // nodes.Add(node);
         return node;
     }

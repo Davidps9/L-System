@@ -81,13 +81,13 @@ public class L_System : MonoBehaviour
     private IEnumerator CreateTree()
     {
         List<Branch> pushedBranches = new List<Branch>();
-        //Node previousNode = new();
-        //Node currentNode = new(previousNode);
 
-        Branch newBranch = CreateBranch(transform, Node.Zero, "Axiom");
+        Node currentNode = Node.Zero;
+        currentNode.radius = radius;
+
+        Branch newBranch = CreateBranch(transform, currentNode, "Axiom");
         pushedBranches.Add(newBranch);
-        Node currentNode = null;
-        // newBranch.GenerateVertex(currentNode, true);
+        currentNode = null;
 
         // float xangle = 0;
         int count = 0;
@@ -104,7 +104,7 @@ public class L_System : MonoBehaviour
 
             if (currentNode == null)
             {
-                currentNode = pushedBranches.Last().CreateNode();
+                currentNode = pushedBranches.Last().CreateNode(radius);
                 Debug.Log("Current Node " + count + ": " + currentNode.position);
             }
 
@@ -138,7 +138,7 @@ public class L_System : MonoBehaviour
                     break;
 
                 case RuleAction.PushBranch:
-                    pushedBranches.Last().CreateMesh();
+                    pushedBranches.Last().CreateMesh(sideCount, material);
 
                     Debug.Log("creanding new branch");
                     newBranch = CreateBranch(pushedBranches.Last().transform, currentNode, "Branch from open");
@@ -149,7 +149,7 @@ public class L_System : MonoBehaviour
 
                 case RuleAction.PopBranch:
                     Debug.Log("acabanding new branch");
-                    pushedBranches.Last().CreateMesh();
+                    pushedBranches.Last().CreateMesh(sideCount, material);
 
                     //previousNode = pushedBranches.Last().rootNode;
                     pushedBranches.RemoveAt(pushedBranches.Count - 1);
@@ -167,7 +167,7 @@ public class L_System : MonoBehaviour
             //Debug.Log("Progress: " + 100.0f * count / sentence.Length + "%");
 
         }
-        pushedBranches.Last().CreateMesh();
+        pushedBranches.Last().CreateMesh(sideCount, material);
     }
 
     Branch CreateBranch(Transform parent, Node rootNode, string name = "Branch")
@@ -177,7 +177,7 @@ public class L_System : MonoBehaviour
         newBranch.AddComponent<MeshFilter>();
         newBranch.AddComponent<MeshRenderer>();
         Branch newBranchScript = newBranch.AddComponent<Branch>();
-        newBranchScript.Initialize(parent, rootNode, sideCount, radius, material);
+        newBranchScript.Initialize(parent, rootNode);
         return newBranchScript;
     }
 
