@@ -5,12 +5,14 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(HingeJoint))]
+[RequireComponent(typeof(MeshCollider))]
 public class Branch : MonoBehaviour
 {
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private Rigidbody rb;
     private HingeJoint joint;
+    private MeshCollider meshCollider;
     [HideInInspector] public List<Node> nodes = new();
     [HideInInspector] public Node lastNode => nodes.Last();
 
@@ -20,6 +22,7 @@ public class Branch : MonoBehaviour
         meshRenderer = GetComponent<MeshRenderer>();
         rb = GetComponent<Rigidbody>();
         joint = GetComponent<HingeJoint>();
+        meshCollider = GetComponent<MeshCollider>();
 
         transform.SetParent(parent, false);
         transform.localPosition = rootNode.position;
@@ -49,7 +52,10 @@ public class Branch : MonoBehaviour
         }
 
         meshRenderer.material = material;
-        meshFilter.mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount, "Branch");
+        Mesh mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount, "Branch");
+        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
+
         rb.isKinematic = false;
     }
 
