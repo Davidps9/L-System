@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   axiom: F
   rules:
-  - originalCase: 0
+  - originalCase: 70
     conversion: FF-[XY]+[XY]
+  - originalCase: 88
+    conversion: -FY
+  - originalCase: 89
+    conversion: +FX
   words:
   - character: 88
     action: 0
@@ -30,5 +34,5 @@ MonoBehaviour:
     action: 1
     value: 22.5
   - character: 45
-    action: 2
-    value: 22.5
+    action: 1
+    value: -22.5

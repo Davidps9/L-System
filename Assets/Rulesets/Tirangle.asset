@@ -29,5 +29,5 @@ MonoBehaviour:
     action: 1
     value: 60
   - character: 45
-    action: 2
-    value: 60
+    action: 1
+    value: -60

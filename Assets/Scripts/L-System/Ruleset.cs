@@ -27,10 +27,8 @@ public class Word
 public enum RuleAction
 {
     MoveForward,
-    RotateZPositive,
-    RotateZNegative,
-    RotateXPositive,
-    RotateXNegative,
+    RotateZ,
+    RotateX,
     PushBranch,
     PopBranch
 }

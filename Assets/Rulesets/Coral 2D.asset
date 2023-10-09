@@ -24,11 +24,11 @@ MonoBehaviour:
     action: 1
     value: 25
   - character: 45
-    action: 2
-    value: 25
+    action: 1
+    value: -25
   - character: 91
-    action: 5
+    action: 3
     value: 0
   - character: 93
-    action: 6
+    action: 4
     value: 0

@@ -32,17 +32,17 @@ MonoBehaviour:
     action: 1
     value: 25
   - character: 122
+    action: 1
+    value: -25
+  - character: 88
     action: 2
     value: 25
-  - character: 88
-    action: 3
-    value: 25
   - character: 120
-    action: 4
-    value: 25
+    action: 2
+    value: -25
   - character: 91
-    action: 5
+    action: 3
     value: 0
   - character: 93
-    action: 6
+    action: 4
     value: 0

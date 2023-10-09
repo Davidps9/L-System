@@ -35,6 +35,7 @@ public class L_System : MonoBehaviour
      * */
     [Header("L-System Parameters")]
     [SerializeField] private Ruleset ruleset;
+    [SerializeField] private bool procedurallyGenerate = false;
     [SerializeField] private GameObject branchPrefab;
 
     [Header("Rendering Parameters")]
@@ -46,7 +47,10 @@ public class L_System : MonoBehaviour
 
     void Start()
     {
-        ruleset = ProceduralGenerator.GenerateRuleSet(10);
+        if (procedurallyGenerate)
+        {
+            ruleset = ProceduralGenerator.GenerateRuleSet(10);
+        }
         sentence = ruleset.axiom;
         //TurtleConversion();
     }
@@ -114,20 +118,12 @@ public class L_System : MonoBehaviour
                     currentNode = null;
                     break;
 
-                case RuleAction.RotateZPositive:
+                case RuleAction.RotateZ:
                     currentNode.localRotation += Vector3.forward * wordInfo.value;
                     break;
 
-                case RuleAction.RotateZNegative:
-                    currentNode.localRotation += Vector3.back * wordInfo.value;
-                    break;
-
-                case RuleAction.RotateXPositive:
+                case RuleAction.RotateX:
                     currentNode.localRotation += Vector3.right * wordInfo.value;
-                    break;
-
-                case RuleAction.RotateXNegative:
-                    currentNode.localRotation += Vector3.left * wordInfo.value;
                     break;
 
                 case RuleAction.PushBranch:
