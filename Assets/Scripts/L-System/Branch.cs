@@ -4,14 +4,14 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(HingeJoint))]
+[RequireComponent(typeof(Joint))]
 [RequireComponent(typeof(MeshCollider))]
 public class Branch : MonoBehaviour
 {
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private Rigidbody rb;
-    private HingeJoint joint;
+    private Joint joint;
     private MeshCollider meshCollider;
     [HideInInspector] public List<Node> nodes = new();
     [HideInInspector] public Node lastNode => nodes.Last();
@@ -21,14 +21,14 @@ public class Branch : MonoBehaviour
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
         rb = GetComponent<Rigidbody>();
-        joint = GetComponent<HingeJoint>();
+        joint = GetComponent<Joint>();
         meshCollider = GetComponent<MeshCollider>();
 
         transform.SetParent(parent, false);
-        transform.localPosition = rootNode.position;
 
         if (parent.TryGetComponent<Rigidbody>(out var parentRb))
         {
+            transform.localPosition = rootNode.position;
             joint.connectedBody = parentRb;
             joint.autoConfigureConnectedAnchor = true;
         }
