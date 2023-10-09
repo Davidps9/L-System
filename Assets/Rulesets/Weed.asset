@@ -36,3 +36,9 @@ MonoBehaviour:
   - character: 45
     action: 1
     value: -22.5
+  - character: 91
+    action: 3
+    value: 0
+  - character: 93
+    action: 4
+    value: 0
