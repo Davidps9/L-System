@@ -46,6 +46,7 @@ public class L_System : MonoBehaviour
 
     void Start()
     {
+        ruleset = ProceduralGenerator.GenerateRuleSet(10);
         sentence = ruleset.axiom;
         //TurtleConversion();
     }
