@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
+using UnityEngine.UIElements;
+using UnityEditor;
 
 public static class MeshGenerator
 {
@@ -26,7 +28,15 @@ public static class MeshGenerator
                 Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad) == 0 ? float.MaxValue : 1 / Mathf.Cos(localAngleBetween.z * Mathf.Deg2Rad)
             );
 
-            int vertexIndex = meshInfo.CreateVertex(nodes[i].position, angleBetween, scale, (i == 0 || i == nodes.Length - 1));
+            int vertexIndex = meshInfo.CreateVertex(nodes[i].position, angleBetween, scale);
+
+
+            meshInfo.CreateUVs(vertexIndex, (i+1) / nodes.Length);
+
+            if (i == 0 || i == nodes.Length - 1)
+            {
+                meshInfo.CreateCap(vertexIndex);
+            }
 
             if (nodes[i].parent != null)
             {
@@ -38,15 +48,15 @@ public static class MeshGenerator
         return meshInfo.CreateMesh(name);
     }
 
-    private static int CreateVertex(this MeshInfo meshInfo, Vector3 position, Vector3 rotation, Vector2 scale, bool addCap = false)
+    private static int CreateVertex(this MeshInfo meshInfo, Vector3 position, Vector3 rotation, Vector2 scale)
     {
         // Extract info from MeshInfo
         List<Vector3> vertices = meshInfo.vertices;
-        List<int> triangles = meshInfo.triangles;
         //List<Vector2> uvs = meshInfo.uvs;
         int sideCount = meshInfo.sideCount;
 
         vertices.Add(position);
+        int vertexIndex = vertices.IndexOf(position);
         //uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
 
         Quaternion rotationQuaternion = Quaternion.Euler(rotation.x, 0, rotation.z);
@@ -61,18 +71,17 @@ public static class MeshGenerator
             //uvs.Add(new Vector2(vertex.x, vertex.z) * vertex.y);
         }
 
-        int nodeIndex = vertices.IndexOf(position);
-        if (addCap)
-        {
-            for (int i = 0; i < sideCount; i++)
-            {
-                triangles.Add(nodeIndex);
-                triangles.Add(nodeIndex + 1 + (i + 1) % sideCount);
-                triangles.Add(nodeIndex + 1 + i);
-            }
-        }
+        return vertexIndex;
+    }
 
-        return nodeIndex;
+    private static void CreateCap(this MeshInfo meshInfo, int index)
+    {
+        for (int x = 0; x < meshInfo.sideCount; x++)
+        {
+            meshInfo.triangles.Add(index);
+            meshInfo.triangles.Add(index + 1 + (x + 1) % meshInfo.sideCount);
+            meshInfo.triangles.Add(index + 1 + x);
+        }
     }
 
     private static void CreateWalls(this MeshInfo meshInfo, int index, int prevIndex)
@@ -101,16 +110,43 @@ public static class MeshGenerator
         }
     }
 
+    private static void CreateUVs(this MeshInfo meshInfo, int index, float y)
+    {
+        if(meshInfo.uvs.Count != index)
+        {
+            Debug.LogWarning("UV list has wrong number of vertices. Aborting creation.");
+            return;
+        }
+
+        int sizeX = 1 / meshInfo.sideCount;
+        meshInfo.uvs.Add(new Vector2(0.5f, y));
+
+        for(int i = 0; i < meshInfo.sideCount; i++)
+        {
+            meshInfo.uvs.Add(new Vector2(sizeX * i, y));
+        }
+    }
+
     private static Mesh CreateMesh(this MeshInfo meshInfo, string name)
     {
         Mesh mesh = new();
         mesh.name = name;
         mesh.SetVertices(meshInfo.vertices);
         mesh.SetTriangles(meshInfo.triangles, 0);
+
+        if (meshInfo.uvs.Count == mesh.vertexCount)
+        {
+            mesh.SetUVs(1, meshInfo.uvs);
+        } else
+        {
+            Unwrapping.GenerateSecondaryUVSet(mesh);
+        }
+
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
         mesh.RecalculateNormals();
-        Unwrapping.GenerateSecondaryUVSet(mesh);
+        
+        
 
         return mesh;
     }
