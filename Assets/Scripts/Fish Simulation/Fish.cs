@@ -6,7 +6,7 @@ public class Fish : MonoBehaviour
 {
     private Vector3 velocity = Vector3.zero;
     private FishSimulation simulation;
-    private Collider Collider => GetComponent<Collider>();
+    private List<Fish> fishInRange = new();
 
     public void Init(FishSimulation simulation)
     {
@@ -33,7 +33,6 @@ public class Fish : MonoBehaviour
         Vector3 center = Vector3.zero;
         int count = 0;
 
-        Fish[] fishInRange = GetFishInRange(simulation.visualRange);
         foreach (Fish fish in fishInRange)
         {
             center += fish.transform.position;
@@ -50,9 +49,9 @@ public class Fish : MonoBehaviour
     // Move away from other boids that are too close to avoid colliding
     private void AvoidOthers()
     {
-        Fish[] fishInRange = GetFishInRange(simulation.minDistance);
         foreach (Fish fish in fishInRange)
         {
+            if(fish.Distance(this) > simulation.minDistance) { return; }
             velocity += (transform.position - fish.transform.position).normalized * simulation.avoidFactor;
         }
     }
@@ -64,7 +63,6 @@ public class Fish : MonoBehaviour
         Vector3 avgVelocity = Vector3.zero;
         int count = 0;
 
-        Fish[] fishInRange = GetFishInRange(simulation.visualRange);
         foreach (Fish fish in fishInRange)
         {
             avgVelocity += fish.velocity;
@@ -114,19 +112,26 @@ public class Fish : MonoBehaviour
         }
     }
 
-    private Fish[] GetFishInRange(float range)
+    private void OnTriggerEnter(Collider other)
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, range);
-        List<Fish> fishList = new();
-
-        foreach (Collider collider in colliders)
+        if (other.gameObject.TryGetComponent(out Fish fish))
         {
-            if (collider != Collider && collider.gameObject.TryGetComponent(out Fish fish))
-            {
-                fishList.Add(fish);
-            }
+            if (fishInRange.Contains(fish)) { return; }
+            fishInRange.Add(fish);
         }
+    }
 
-        return fishList.ToArray();
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.TryGetComponent(out Fish fish))
+        {
+            if(!fishInRange.Contains(fish)) { return; }
+            fishInRange.Add(fish);
+        }
+    }
+
+    public float Distance(Fish otherFish)
+    {
+        return (transform.position - otherFish.transform.position).magnitude;
     }
 }
