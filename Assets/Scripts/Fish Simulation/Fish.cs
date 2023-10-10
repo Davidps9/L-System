@@ -12,6 +12,7 @@ public class Fish : MonoBehaviour
     {
         this.simulation = simulation;
         velocity = Random.insideUnitSphere * simulation.maxSpeed;
+        GetComponent<SphereCollider>().radius = simulation.visualRange;
     }
 
     private void Update()
@@ -21,7 +22,7 @@ public class Fish : MonoBehaviour
         MatchVelocity();
         LimitSpeed();
         KeepWithinBounds();
-        Debug.Log(velocity);
+        Debug.Log(fishInRange.Count);
         transform.position += velocity * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(velocity);
     }
