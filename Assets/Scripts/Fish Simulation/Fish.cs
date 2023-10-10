@@ -1,10 +1,12 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Collider))]
 public class Fish : MonoBehaviour
 {
-    private Vector3 velocity = Vector3.zero;
+    [NonSerialized] public Vector3 velocity = Vector3.zero;
     private FishSimulation simulation;
     private List<Fish> fishInRange = new();
 
@@ -127,7 +129,7 @@ public class Fish : MonoBehaviour
         if (other.gameObject.TryGetComponent(out Fish fish))
         {
             if(!fishInRange.Contains(fish)) { return; }
-            fishInRange.Add(fish);
+            fishInRange.Remove(fish);
         }
     }
 
