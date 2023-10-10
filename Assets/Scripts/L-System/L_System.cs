@@ -49,7 +49,7 @@ public class L_System : MonoBehaviour
     {
         if (procedurallyGenerate)
         {
-            ruleset = ProceduralGenerator.GenerateRuleSet(10);
+            ruleset = ProceduralGenerator.GenerateRuleSet(10, new Vector2(25, 45));
         }
         sentence = ruleset.axiom;
         //TurtleConversion();
@@ -127,6 +127,7 @@ public class L_System : MonoBehaviour
                     break;
 
                 case RuleAction.PushBranch:
+
                     pushedBranches.Last().CreateMesh(sideCount, material);
 
                     Debug.Log("creanding branch " + (pushedBranches.Count + 1));
@@ -137,6 +138,8 @@ public class L_System : MonoBehaviour
                     break;
 
                 case RuleAction.PopBranch:
+
+                    if(pushedBranches.Count <= 1) { break; }
                     Debug.Log("Ending branch " + pushedBranches.Count);
                     pushedBranches.Last().CreateMesh(sideCount, material);
 
