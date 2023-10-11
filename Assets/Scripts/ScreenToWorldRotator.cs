@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ScreenForceField : MonoBehaviour
+public class ScreenToWorldRotator : MonoBehaviour
 {
     private void Start()
     {
