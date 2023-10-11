@@ -40,9 +40,10 @@ public class L_System : MonoBehaviour
 
     [Header("Rendering Parameters")]
     [SerializeField] private float radius;
+    [SerializeField] private float numberOfStages;
     [SerializeField] private int sideCount;
     [SerializeField] private Material material;
-
+    private float iterations = 0;
     private string sentence;
 
     void Start()
@@ -52,7 +53,7 @@ public class L_System : MonoBehaviour
             ruleset = ProceduralGenerator.GenerateRuleSet(10, new Vector2(25, 45));
         }
         sentence = ruleset.axiom;
-        //TurtleConversion();
+        GenerateLSystem();
     }
 
     private void TurtleConversion()
@@ -80,7 +81,10 @@ public class L_System : MonoBehaviour
 
         }
         sentence = newSentence;
-
+        if(transform.childCount > 1)
+        {
+            Destroy(transform.GetChild(0).gameObject);
+        }
         StartCoroutine(CreateTree());
     }
 
@@ -160,6 +164,18 @@ public class L_System : MonoBehaviour
 
         }
         pushedBranches.Last().CreateMesh(sideCount, material);
+        yield return new WaitForSeconds(1);
+
+       if( iterations < numberOfStages) {
+            
+            TurtleConversion();
+            iterations++;
+        }
+        else
+        {
+            Destroy(transform.GetChild(0).gameObject);
+        }
+
     }
 
     Branch CreateBranch(Transform parent, Node rootNode, string name = "Branch")
@@ -176,17 +192,23 @@ public class L_System : MonoBehaviour
         return null;
     }
 
+    public void GenerateLSystem()
+    {        
+            TurtleConversion();
+    }
+
+    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            foreach (Transform child in transform)
-            {
-                Destroy(child.gameObject);
-            }
+        //if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    foreach (Transform child in transform)
+        //    {
+        //        Destroy(child.gameObject);
+        //    }
 
-            TurtleConversion();
-            Debug.Log(sentence);
-        }
+        //    TurtleConversion();
+        //    Debug.Log(sentence);
+        //}
     }
 }

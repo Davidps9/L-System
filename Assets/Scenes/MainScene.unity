@@ -152,11 +152,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac5f3516a40b140448d662d673256186, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ruleset: {fileID: 11400000, guid: 5be0a75beccafee488f2f321f72afa2c, type: 2}
-  procedurallyGenerate: 1
+  ruleset: {fileID: 11400000, guid: fbde5c72708a53e4987f763e1d9802aa, type: 2}
+  procedurallyGenerate: 0
   branchPrefab: {fileID: 2392352463464731594, guid: 61284f93e0f82dd4fa58ccbf55188e39,
     type: 3}
   radius: 0.5
+  numberOfStages: 2
   sideCount: 5
   material: {fileID: 2100000, guid: eea8355132e5dc4438f496fb64ef7f4b, type: 2}
 --- !u!4 &634008208
