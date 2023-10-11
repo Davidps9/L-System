@@ -4,14 +4,17 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Collider))]
-public class Fish : MonoBehaviour
+public class Fish : FishDetectable
 {
-    [NonSerialized] public Vector3 velocity = Vector3.zero;
     private FishSimulation simulation;
-    private List<Fish> fishInRange = new();
+    private List<FishDetectable> fishInRange = new();
 
     public void Init(FishSimulation simulation)
     {
+        affectsAlignment = true;
+        affectsSeparation = true;
+        affectsCohesion = true;
+
         this.simulation = simulation;
         velocity = Random.insideUnitSphere * simulation.maxSpeed;
         GetComponent<SphereCollider>().radius = simulation.visualRange;
@@ -29,15 +32,16 @@ public class Fish : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(velocity);
     }
 
-    // Coherence
+    // Cohesion
     // Find the center of mass of the other boids and adjust velocity slightly to point towards the center of mass.
     private void FlyTowardsCenter()
     {
         Vector3 center = Vector3.zero;
         int count = 0;
 
-        foreach (Fish fish in fishInRange)
+        foreach (FishDetectable fish in fishInRange)
         {
+            if (!fish.affectsCohesion) { continue; }
             center += fish.transform.position;
             count++;
         }
@@ -48,26 +52,28 @@ public class Fish : MonoBehaviour
         }
     }
 
-    // Avoidance
+    // Separation
     // Move away from other boids that are too close to avoid colliding
     private void AvoidOthers()
     {
-        foreach (Fish fish in fishInRange)
+        foreach (FishDetectable fish in fishInRange)
         {
+            if(!fish.affectsSeparation) { continue; }
             if(fish.Distance(this) > simulation.minDistance) { return; }
             velocity += (transform.position - fish.transform.position).normalized * simulation.avoidFactor;
         }
     }
 
-    // Cohesion
+    // Alignment
     // Find the average velocity (speed and direction) of the other boids and adjust velocity slightly to match.
     private void MatchVelocity()
     {
         Vector3 avgVelocity = Vector3.zero;
         int count = 0;
 
-        foreach (Fish fish in fishInRange)
+        foreach (FishDetectable fish in fishInRange)
         {
+            if (!fish.affectsAlignment) { continue; }
             avgVelocity += fish.velocity;
             count++;
         }
@@ -131,10 +137,5 @@ public class Fish : MonoBehaviour
             if(!fishInRange.Contains(fish)) { return; }
             fishInRange.Remove(fish);
         }
-    }
-
-    public float Distance(Fish otherFish)
-    {
-        return (transform.position - otherFish.transform.position).magnitude;
     }
 }

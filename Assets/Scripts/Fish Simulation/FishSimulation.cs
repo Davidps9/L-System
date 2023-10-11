@@ -10,7 +10,7 @@ public class FishSimulation : MonoBehaviour
     public float minDistance = 1f;
     [Range(0f, 0.1f)] public float avoidFactor = 0.05f; // separation
     [Header("Cohesion")]
-    [Range(0f, 0.01f)] public float centeringFactor = 0.005f; // coherence
+    [Range(0f, 0.01f)] public float centeringFactor = 0.005f; // cohesion
     [Header("Bounds")]
     public Vector3 bounds = Vector3.one;
     [Range(0, 1)] public float turnFactor = 1;

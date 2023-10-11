@@ -135,9 +135,10 @@ GameObject:
   - component: {fileID: 123408347}
   - component: {fileID: 123408346}
   - component: {fileID: 123408345}
+  - component: {fileID: 123408348}
   m_Layer: 0
   m_Name: Cylinder
-  m_TagString: Untagged
+  m_TagString: FishRepellant
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -221,6 +222,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 123408343}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &123408348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123408343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e1ea2ca57149a844ac33759420df714, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &247976576
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,15 +308,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6123d559179be234d840d399baeae06d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchingFactor: 0.05
+  matchingFactor: 0.0339
   minDistance: 1
   avoidFactor: 0.05
-  centeringFactor: 0.005
-  bounds: {x: 50, y: 20, z: 50}
-  turnFactor: 0.1
-  visualRange: 5
+  centeringFactor: 0.00386
+  bounds: {x: 25, y: 10, z: 25}
+  turnFactor: 0.18
+  visualRange: 2
   maxSpeed: 30
-  fishCount: 100
+  fishCount: 80
   fishPrefab: {fileID: 6230784100627652452, guid: 6d84e338ce5fdb142b84cbd3f74bfe49,
     type: 3}
 --- !u!4 &507504346
