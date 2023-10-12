@@ -43,25 +43,29 @@ public class L_System : MonoBehaviour
     [SerializeField] private float numberOfStages;
     [SerializeField] private int sideCount;
     [SerializeField] private Material material;
-    private float iterations = 0;
-    private string sentence;
+    private float iterations = 1;
+    private string sentence = "", previousSentence = "";
+    private List<Branch> pushedBranches = new();
 
     void Start()
     {
-        if (procedurallyGenerate)
-        {
-            ruleset = ProceduralGenerator.GenerateRuleSet(10, new Vector2(25, 45));
-        }
-        sentence = ruleset.axiom;
         GenerateLSystem();
     }
 
     private void TurtleConversion()
     {
+        if (sentence.Length > 0)
+        {
+            previousSentence = sentence;
+        }
+        else
+        {
+            sentence = ruleset.axiom;
+        }
+
         string newSentence = "";
         foreach (char word in sentence)
         {
-
             bool found = false;
 
             foreach (Rule rule in ruleset.rules)
@@ -78,29 +82,40 @@ public class L_System : MonoBehaviour
             {
                 newSentence += word;
             }
-
         }
         sentence = newSentence;
-        if(transform.childCount > 1)
-        {
-            Destroy(transform.GetChild(0).gameObject);
-        }
         StartCoroutine(CreateTree());
     }
 
     private IEnumerator CreateTree()
     {
-        List<Branch> pushedBranches = new List<Branch>();
+        Node currentNode = null;
+        string workingSentence = sentence;
 
-        Node currentNode = Node.Zero;
-        currentNode.radius = radius;
+        // check if current sentence starts like previous sentence
+        if (previousSentence.Length > 0 && sentence.Substring(0, previousSentence.Length) == previousSentence)
+        {
+            workingSentence = sentence.Substring(previousSentence.Length);
+        }
+        else
+        {
+            // clear previous branch
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+            pushedBranches.Clear();
 
-        Branch newBranch = CreateBranch(transform, currentNode, "Axiom");
-        pushedBranches.Add(newBranch);
-        currentNode = null;
+            currentNode = Node.Zero;
+            currentNode.radius = radius;
+
+            Branch newBranch = CreateBranch(transform, currentNode, "Axiom");
+            pushedBranches.Add(newBranch);
+            currentNode = null;
+        }
 
         int count = 0;
-        foreach (char word in sentence)
+        foreach (char word in workingSentence)
         {
             yield return new WaitForEndOfFrame();
 
@@ -134,8 +149,8 @@ public class L_System : MonoBehaviour
 
                     pushedBranches.Last().CreateMesh(sideCount, material);
 
-                    Debug.Log("creanding branch " + (pushedBranches.Count + 1));
-                    newBranch = CreateBranch(pushedBranches.Last().transform, currentNode, "Branch lvl " + (pushedBranches.Count + 1));
+                    //Debug.Log("creanding branch " + (pushedBranches.Count + 1));
+                    Branch newBranch = CreateBranch(pushedBranches.Last().transform, currentNode, "Branch lvl " + (pushedBranches.Count + 1));
                     pushedBranches.Add(newBranch);
 
                     currentNode = null;
@@ -143,37 +158,26 @@ public class L_System : MonoBehaviour
 
                 case RuleAction.PopBranch:
 
-                    if(pushedBranches.Count <= 1) { break; }
-                    Debug.Log("Ending branch " + pushedBranches.Count);
+                    if (pushedBranches.Count <= 1) { break; }
+                    //Debug.Log("Ending branch " + pushedBranches.Count);
                     pushedBranches.Last().CreateMesh(sideCount, material);
 
-                    //previousNode = pushedBranches.Last().rootNode;
                     pushedBranches.RemoveAt(pushedBranches.Count - 1);
-
-                    // meshGeneratorScript.GenerateVertex(currentNode, true);
-
                     currentNode = null;
-
-                    //newBranch = CreateBranch(currentNode, pushedBranches.Last().transform, "Branch from close");
-                    //pushedBranches.Add(newBranch);
                     break;
             }
 
             count++;
-            //Debug.Log("Progress: " + 100.0f * count / sentence.Length + "%");
+            Debug.Log("Iteration " + iterations + " progress: " + 100.0f * count / sentence.Length + "%");
 
         }
         pushedBranches.Last().CreateMesh(sideCount, material);
-        yield return new WaitForSeconds(1);
+        //yield return new WaitForSeconds(1);
 
-       if( iterations < numberOfStages) {
-            
+        if (iterations < numberOfStages)
+        {
             TurtleConversion();
             iterations++;
-        }
-        else
-        {
-            Destroy(transform.GetChild(0).gameObject);
         }
 
     }
@@ -193,11 +197,16 @@ public class L_System : MonoBehaviour
     }
 
     public void GenerateLSystem()
-    {        
-            TurtleConversion();
+    {
+        if (procedurallyGenerate)
+        {
+            ruleset = ProceduralGenerator.GenerateRuleSet(10, new Vector2(25, 45));
+        }
+
+        TurtleConversion();
     }
 
-    
+
     void Update()
     {
         //if (Input.GetKeyDown(KeyCode.A))
