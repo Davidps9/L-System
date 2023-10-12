@@ -112,8 +112,6 @@ public class L_System : MonoBehaviour
         int count = 0;
         foreach (char word in workingSentence)
         {
-            yield return new WaitForEndOfFrame();
-
             Word wordInfo = Array.Find(ruleset.words, w => w.character == word);
             if (wordInfo == null)
             {
@@ -149,6 +147,8 @@ public class L_System : MonoBehaviour
                     pushedBranches.Add(newBranch);
 
                     currentNode = null;
+
+                    yield return new WaitForEndOfFrame();
                     break;
 
                 case RuleAction.PopBranch:
@@ -159,6 +159,8 @@ public class L_System : MonoBehaviour
 
                     pushedBranches.RemoveAt(pushedBranches.Count - 1);
                     currentNode = null;
+
+                    yield return new WaitForEndOfFrame();
                     break;
             }
 
@@ -175,12 +177,13 @@ public class L_System : MonoBehaviour
             Destroy(transform.GetChild(0).gameObject);
         }
 
+        yield return new WaitForEndOfFrame();
+
         if (iterations < numberOfStages)
         {
-            TurtleConversion();
             iterations++;
+            TurtleConversion();
         }
-
     }
 
     Branch CreateBranch(Transform parent, Node rootNode, string name = "Branch")
