@@ -99,11 +99,6 @@ public class L_System : MonoBehaviour
         }
         else
         {
-            // clear previous branch
-            foreach (Transform child in transform)
-            {
-                Destroy(child.gameObject);
-            }
             pushedBranches.Clear();
 
             currentNode = Node.Zero;
@@ -168,11 +163,17 @@ public class L_System : MonoBehaviour
             }
 
             count++;
-            Debug.Log("Iteration " + iterations + " progress: " + 100.0f * count / sentence.Length + "%");
+            Debug.Log("Iteration " + iterations + " progress: " + 100.0f * count / workingSentence.Length + "%");
 
         }
         pushedBranches.Last().CreateMesh(sideCount, material);
         //yield return new WaitForSeconds(1);
+
+        // cleanup extra iterations
+        if (transform.childCount > 1)
+        {
+            Destroy(transform.GetChild(0).gameObject);
+        }
 
         if (iterations < numberOfStages)
         {

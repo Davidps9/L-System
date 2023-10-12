@@ -157,8 +157,8 @@ MonoBehaviour:
   branchPrefab: {fileID: 2392352463464731594, guid: 61284f93e0f82dd4fa58ccbf55188e39,
     type: 3}
   radius: 0.5
-  numberOfStages: 2
-  sideCount: 5
+  numberOfStages: 6
+  sideCount: 6
   material: {fileID: 2100000, guid: eea8355132e5dc4438f496fb64ef7f4b, type: 2}
 --- !u!4 &634008208
 Transform:

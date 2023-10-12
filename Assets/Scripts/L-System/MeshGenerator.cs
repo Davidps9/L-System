@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
-using UnityEngine.UIElements;
 using UnityEditor;
+using UnityEngine;
 
 public static class MeshGenerator
 {
@@ -31,7 +29,7 @@ public static class MeshGenerator
             int vertexIndex = meshInfo.CreateVertex(nodes[i].position, angleBetween, scale);
 
 
-            meshInfo.CreateUVs(vertexIndex, (i+1) / nodes.Length);
+            meshInfo.CreateUVs(vertexIndex, (i + 1) / nodes.Length);
 
             if (i == 0 || i == nodes.Length - 1)
             {
@@ -40,7 +38,7 @@ public static class MeshGenerator
 
             if (nodes[i].parent != null)
             {
-                int parentVertexIndex = meshInfo.vertices.IndexOf(nodes[i].parent.position);
+                int parentVertexIndex = vertexIndex - (sideCount + 1);
                 meshInfo.CreateWalls(vertexIndex, parentVertexIndex);
             }
         }
@@ -52,12 +50,10 @@ public static class MeshGenerator
     {
         // Extract info from MeshInfo
         List<Vector3> vertices = meshInfo.vertices;
-        //List<Vector2> uvs = meshInfo.uvs;
         int sideCount = meshInfo.sideCount;
 
         vertices.Add(position);
-        int vertexIndex = vertices.IndexOf(position);
-        //uvs.Add(new Vector2(node.position.x, node.position.z) * node.position.y);
+        int vertexIndex = vertices.Count - 1;
 
         Quaternion rotationQuaternion = Quaternion.Euler(rotation.x, 0, rotation.z);
         for (int i = 0; i < sideCount; i++)
@@ -112,7 +108,7 @@ public static class MeshGenerator
 
     private static void CreateUVs(this MeshInfo meshInfo, int index, float y)
     {
-        if(meshInfo.uvs.Count != index)
+        if (meshInfo.uvs.Count != index)
         {
             Debug.LogWarning("UV list has wrong number of vertices. Aborting creation.");
             return;
@@ -121,7 +117,7 @@ public static class MeshGenerator
         int sizeX = 1 / meshInfo.sideCount;
         meshInfo.uvs.Add(new Vector2(0.5f, y));
 
-        for(int i = 0; i < meshInfo.sideCount; i++)
+        for (int i = 0; i < meshInfo.sideCount; i++)
         {
             meshInfo.uvs.Add(new Vector2(sizeX * i, y));
         }
@@ -137,7 +133,8 @@ public static class MeshGenerator
         if (meshInfo.uvs.Count == mesh.vertexCount)
         {
             mesh.SetUVs(1, meshInfo.uvs);
-        } else
+        }
+        else
         {
             Unwrapping.GenerateSecondaryUVSet(mesh);
         }
@@ -145,8 +142,8 @@ public static class MeshGenerator
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
         mesh.RecalculateNormals();
-        
-        
+
+
 
         return mesh;
     }
