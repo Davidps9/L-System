@@ -12,8 +12,11 @@ public class DynamicForceField : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        Vector3 force = ScreenToWorldRotator.MouseVelocity * 10;
-        Debug.Log(force);
-        other.attachedRigidbody.AddForce(force);
+        Vector3 direction = ScreenToWorldRotator.MouseVelocity.normalized;
+        Debug.Log(direction);
+        if (other.gameObject.TryGetComponent<Branch>(out var branch))
+        {
+            branch.SetTargetRotationWithEase(Quaternion.LookRotation(direction), 1);
+        }
     }
 }

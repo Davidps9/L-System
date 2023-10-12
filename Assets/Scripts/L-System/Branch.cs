@@ -1,45 +1,34 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Joint))]
 [RequireComponent(typeof(MeshCollider))]
-public class Branch : MonoBehaviour
+public class Branch : FishDetectable
 {
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
-    private Rigidbody rb;
-    private Joint joint;
     private MeshCollider meshCollider;
     [HideInInspector] public List<Node> nodes = new();
     [HideInInspector] public Node lastNode => nodes.Last();
+
+    #region Branch Creation
 
     public void Initialize(Transform parent, Node rootNode)
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
-        rb = GetComponent<Rigidbody>();
-        joint = GetComponent<Joint>();
         meshCollider = GetComponent<MeshCollider>();
 
-        transform.SetParent(parent, false);
+        transform.SetParent(parent);
+        transform.localPosition = rootNode.position;
 
-        if (parent.TryGetComponent<Rigidbody>(out var parentRb))
-        {
-            transform.localPosition = rootNode.position;
-            joint.connectedBody = parentRb;
-            joint.autoConfigureConnectedAnchor = true;
-        }
-        else
-        {
-            joint.connectedAnchor = transform.position;
-        }
-
-        Node newRootNode = new Node(Vector3.zero, rootNode.rotation);
+        Node newRootNode = new(Vector3.zero, rootNode.rotation);
         newRootNode.radius = rootNode.radius;
         ApplyNode(newRootNode);
+
+        affectsSeparation = true;
     }
 
     public void CreateMesh(int sideCount, Material material)
@@ -54,8 +43,6 @@ public class Branch : MonoBehaviour
         Mesh mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount, "Branch");
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
-
-        rb.isKinematic = false;
     }
 
     public Node CreateNode(float radius)
@@ -70,16 +57,43 @@ public class Branch : MonoBehaviour
         nodes.Add(node);
     }
 
-    //private void OnDrawGizmos()
+    #endregion
+
+    #region Branch Interaction (WORK IN PROGRESS)
+
+    public float rotationSpeed = 5.0f; // Adjust this value to control the smoothing speed
+    private Quaternion targetRotation = Quaternion.identity;
+
+    //void Update()
     //{
-    //    if (nodes.Count > 0)
-    //    {
-    //        Gizmos.color = Color.red;
-    //        for (int i = 0; i < nodes.Count; i++)
-    //        {
-    //            Gizmos.DrawSphere(nodes[i].position, 0.1f);
-    //            Gizmos.DrawMesh(meshFilter.mesh);
-    //        }
-    //    }
+    //    // Smoothly interpolate the rotation towards the target rotation
+    //    Quaternion currentRotation = transform.localRotation;
+    //    float step = rotationSpeed * Time.deltaTime;
+    //    transform.localRotation = Quaternion.RotateTowards(currentRotation, targetRotation, step);
     //}
+
+    // Public method to gradually change the rotation speed and update the target rotation
+    public void SetTargetRotationWithEase(Quaternion newTargetRotation, float easeSpeed)
+    {
+        StopAllCoroutines();
+        StartCoroutine(ChangeRotationWithEase(newTargetRotation, easeSpeed));
+    }
+
+    private IEnumerator ChangeRotationWithEase(Quaternion newTargetRotation, float easeSpeed)
+    {
+        Quaternion startRotation = transform.localRotation;
+        float journeyLength = Quaternion.Angle(startRotation, newTargetRotation);
+        float startTime = Time.time;
+
+        while (transform.localRotation != newTargetRotation)
+        {
+            float distanceCovered = (Time.time - startTime) * easeSpeed;
+            float fractionOfJourney = distanceCovered / journeyLength;
+
+            transform.localRotation = Quaternion.Slerp(startRotation, newTargetRotation, fractionOfJourney);
+            yield return null;
+        }
+    }
+
+    #endregion
 }
