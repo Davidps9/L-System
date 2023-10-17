@@ -112,6 +112,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxAngle: 5
-  maxVelocity: 10
-  damping: 0.99
+  maxVelocity: 25
+  damping: 0.995
   forceMultiplier: 100

@@ -95,7 +95,7 @@ public class Branch : MonoBehaviour
             angularVelocity -= angularAcceleration * Time.deltaTime * forceMultiplier;
         }
 
-        Debug.Log($"Force {angularVelocity}");
+        //Debug.Log($"Force {angularVelocity}");
         if (Mathf.Abs(angularVelocity) > maxVelocity)
         {
             angularVelocity = Mathf.Sign(angularVelocity) * maxVelocity;
@@ -104,7 +104,7 @@ public class Branch : MonoBehaviour
 
     private void RotateZ(float normalizedAngle, float maxAngle)
     {
-        Debug.Log($"Angle: {maxAngle}");
+        //Debug.Log($"Angle: {maxAngle}");
         transform.eulerAngles = new Vector3(0, 0, normalizedAngle * maxAngle);
     }
 
