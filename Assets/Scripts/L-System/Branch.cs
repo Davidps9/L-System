@@ -1,45 +1,36 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Joint))]
 [RequireComponent(typeof(MeshCollider))]
-public class Branch : MonoBehaviour
+public class Branch : FishDetectable
 {
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
-    private Rigidbody rb;
-    private Joint joint;
     private MeshCollider meshCollider;
     [HideInInspector] public List<Node> nodes = new();
     [HideInInspector] public Node lastNode => nodes.Last();
+
+    #region Branch Creation
 
     public void Initialize(Transform parent, Node rootNode)
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
-        rb = GetComponent<Rigidbody>();
-        joint = GetComponent<Joint>();
         meshCollider = GetComponent<MeshCollider>();
 
-        transform.SetParent(parent, false);
+        transform.SetParent(parent);
+        transform.localPosition = rootNode.position;
 
-        if (parent.TryGetComponent<Rigidbody>(out var parentRb))
-        {
-            transform.localPosition = rootNode.position;
-            joint.connectedBody = parentRb;
-            joint.autoConfigureConnectedAnchor = true;
-        }
-        else
-        {
-            joint.connectedAnchor = transform.position;
-        }
-
-        Node newRootNode = new Node(Vector3.zero, rootNode.rotation);
+        Node newRootNode = new(Vector3.zero, rootNode.rotation);
         newRootNode.radius = rootNode.radius;
         ApplyNode(newRootNode);
+
+        affectsSeparation = true;
     }
 
     public void CreateMesh(int sideCount, Material material)
@@ -54,8 +45,6 @@ public class Branch : MonoBehaviour
         Mesh mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount, "Branch");
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
-
-        rb.isKinematic = false;
     }
 
     public Node CreateNode(float radius)
@@ -70,16 +59,59 @@ public class Branch : MonoBehaviour
         nodes.Add(node);
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    if (nodes.Count > 0)
-    //    {
-    //        Gizmos.color = Color.red;
-    //        for (int i = 0; i < nodes.Count; i++)
-    //        {
-    //            Gizmos.DrawSphere(nodes[i].position, 0.1f);
-    //            Gizmos.DrawMesh(meshFilter.mesh);
-    //        }
-    //    }
-    //}
+    #endregion
+
+    #region Branch Interaction
+
+    [Header("Movement")]
+    [SerializeField] private float maxAngle = 5;
+    [SerializeField] private float maxVelocity = 10;
+    [SerializeField] private float damping = 0.99f;
+    [SerializeField] private float forceMultiplier = 100;
+
+    private float angle = 0.0f;          // Current swing angle (in radians)
+    private float angularVelocity = 0.0f; // Angular velocity
+
+    void Update()
+    {
+        // Simulate damping
+        angularVelocity *= damping;
+
+        // Calculate the swing motion
+        angle += angularVelocity * Time.deltaTime;
+
+        RotateZ(Mathf.Sin(angle), maxAngle);
+    }
+
+    // Apply a force to the swing
+    public void ApplyForce(Vector2 force)
+    {
+        // Calculate the angular acceleration
+        float angularAcceleration = force.x;
+
+        // Check the direction of the force relative to the current swing direction
+        // Increase or decrease the angular velocity accordingly
+        if (Vector2.Dot(force.normalized, new Vector2(Mathf.Sin(angle), -Mathf.Cos(angle))) > 0)
+        {
+            angularVelocity += angularAcceleration * Time.deltaTime * forceMultiplier;
+        }
+        else
+        {
+            angularVelocity -= angularAcceleration * Time.deltaTime * forceMultiplier;
+        }
+
+        Debug.Log($"Force {angularVelocity}");
+        if(Mathf.Abs(angularVelocity) > maxVelocity)
+        {
+            angularVelocity = Mathf.Sign(angularVelocity) * maxVelocity;
+        }
+    }
+    
+    private void RotateZ(float normalizedAngle, float maxAngle)
+    {
+        Debug.Log($"Angle: { maxAngle }");
+        transform.eulerAngles = new Vector3(0, 0, normalizedAngle * maxAngle);
+    }
+
+    #endregion
 }

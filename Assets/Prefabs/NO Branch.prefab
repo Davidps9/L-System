@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 1498012019546104938}
   - component: {fileID: 1006678828691514809}
   - component: {fileID: 7462822835106791864}
-  - component: {fileID: 7064104064855122285}
+  - component: {fileID: 6248025390880274536}
   - component: {fileID: 3072583229345314152}
   - component: {fileID: 4078674220875137278}
   - component: {fileID: 5277913830331434989}
   m_Layer: 3
-  m_Name: Branch
+  m_Name: NO Branch
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,7 +87,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7064104064855122285
+--- !u!114 &6248025390880274536
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -99,6 +99,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e039bc16aec7544aa576dc5d41b6e8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxAngle: 5
+  maxVelocity: 10
+  damping: 0.99
+  forceMultiplier: 100
 --- !u!59 &3072583229345314152
 HingeJoint:
   m_ObjectHideFlags: 0
