@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -59,40 +61,56 @@ public class Branch : FishDetectable
 
     #endregion
 
-    #region Branch Interaction (WORK IN PROGRESS)
+    #region Branch Interaction
 
-    public float rotationSpeed = 5.0f; // Adjust this value to control the smoothing speed
-    private Quaternion targetRotation = Quaternion.identity;
+    [Header("Movement")]
+    [SerializeField] private float maxAngle = 5;
+    [SerializeField] private float maxVelocity = 10;
+    [SerializeField] private float damping = 0.99f;
+    [SerializeField] private float forceMultiplier = 100;
 
-    //void Update()
-    //{
-    //    // Smoothly interpolate the rotation towards the target rotation
-    //    Quaternion currentRotation = transform.localRotation;
-    //    float step = rotationSpeed * Time.deltaTime;
-    //    transform.localRotation = Quaternion.RotateTowards(currentRotation, targetRotation, step);
-    //}
+    private float angle = 0.0f;          // Current swing angle (in radians)
+    private float angularVelocity = 0.0f; // Angular velocity
 
-    // Public method to gradually change the rotation speed and update the target rotation
-    public void SetTargetRotationWithEase(Quaternion newTargetRotation, float easeSpeed)
+    void Update()
     {
-        StopAllCoroutines();
-        StartCoroutine(ChangeRotationWithEase(newTargetRotation, easeSpeed));
+        // Simulate damping
+        angularVelocity *= damping;
+
+        // Calculate the swing motion
+        angle += angularVelocity * Time.deltaTime;
+
+        RotateZ(Mathf.Sin(angle), maxAngle);
     }
 
-    private IEnumerator ChangeRotationWithEase(Quaternion newTargetRotation, float easeSpeed)
+    // Apply a force to the swing
+    public void ApplyForce(Vector2 force)
     {
-        Quaternion startRotation = transform.localRotation;
-        float journeyLength = Quaternion.Angle(startRotation, newTargetRotation);
-        float startTime = Time.time;
+        // Calculate the angular acceleration
+        float angularAcceleration = force.x;
 
-        while (transform.localRotation != newTargetRotation)
+        // Check the direction of the force relative to the current swing direction
+        // Increase or decrease the angular velocity accordingly
+        if (Vector2.Dot(force.normalized, new Vector2(Mathf.Sin(angle), -Mathf.Cos(angle))) > 0)
         {
-            float distanceCovered = (Time.time - startTime) * easeSpeed;
-            float fractionOfJourney = distanceCovered / journeyLength;
-
-            transform.localRotation = Quaternion.Slerp(startRotation, newTargetRotation, fractionOfJourney);
-            yield return null;
+            angularVelocity += angularAcceleration * Time.deltaTime * forceMultiplier;
         }
+        else
+        {
+            angularVelocity -= angularAcceleration * Time.deltaTime * forceMultiplier;
+        }
+
+        Debug.Log($"Force {angularVelocity}");
+        if(Mathf.Abs(angularVelocity) > maxVelocity)
+        {
+            angularVelocity = Mathf.Sign(angularVelocity) * maxVelocity;
+        }
+    }
+    
+    private void RotateZ(float normalizedAngle, float maxAngle)
+    {
+        Debug.Log($"Angle: { maxAngle }");
+        transform.eulerAngles = new Vector3(0, 0, normalizedAngle * maxAngle);
     }
 
     #endregion
