@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -32,7 +31,7 @@ public class Fish : FishDetectable
         transform.rotation = Quaternion.LookRotation(velocity);
     }
 
-    // Cohesion
+    #region Cohesion
     // Find the center of mass of the other boids and adjust velocity slightly to point towards the center of mass.
     private void FlyTowardsCenter()
     {
@@ -51,20 +50,22 @@ public class Fish : FishDetectable
             velocity += (center - transform.position).normalized * simulation.centeringFactor;
         }
     }
+    #endregion
 
-    // Separation
+    #region Separation
     // Move away from other boids that are too close to avoid colliding
     private void AvoidOthers()
     {
         foreach (FishDetectable fish in fishInRange)
         {
-            if(!fish.affectsSeparation) { continue; }
-            if(fish.Distance(this) > simulation.minDistance) { return; }
+            if (!fish.affectsSeparation) { continue; }
+            if (fish.Distance(this) > simulation.minDistance) { return; }
             velocity += (transform.position - fish.transform.position).normalized * simulation.avoidFactor;
         }
     }
+    #endregion
 
-    // Alignment
+    #region Alignment
     // Find the average velocity (speed and direction) of the other boids and adjust velocity slightly to match.
     private void MatchVelocity()
     {
@@ -83,6 +84,9 @@ public class Fish : FishDetectable
             velocity += (avgVelocity - velocity).normalized * simulation.matchingFactor;
         }
     }
+    #endregion
+
+    #region Other
 
     private void LimitSpeed()
     {
@@ -121,6 +125,8 @@ public class Fish : FishDetectable
         }
     }
 
+    #endregion
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out Fish fish))
@@ -134,7 +140,7 @@ public class Fish : FishDetectable
     {
         if (other.gameObject.TryGetComponent(out Fish fish))
         {
-            if(!fishInRange.Contains(fish)) { return; }
+            if (!fishInRange.Contains(fish)) { return; }
             fishInRange.Remove(fish);
         }
     }
