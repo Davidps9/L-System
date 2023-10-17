@@ -12,4 +12,9 @@ public abstract class FishDetectable : MonoBehaviour
     {
         return (transform.position - otherFish.transform.position).magnitude;
     }
+
+    public float Distance(Collider collider)
+    {
+        return (transform.position - collider.bounds.ClosestPoint(transform.position)).magnitude;
+    }
 }

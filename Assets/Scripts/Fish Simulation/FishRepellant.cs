@@ -2,8 +2,5 @@ using UnityEngine;
 
 public class FishRepellant : FishDetectable
 {
-    private void Start()
-    {
-        affectsSeparation = true;
-    }
+    // TODO: Call fish AvoidPoint when collidng with them
 }
