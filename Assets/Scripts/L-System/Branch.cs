@@ -1,13 +1,10 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Branch : FishDetectable
+public class Branch : MonoBehaviour
 {
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
@@ -29,8 +26,6 @@ public class Branch : FishDetectable
         Node newRootNode = new(Vector3.zero, rootNode.rotation);
         newRootNode.radius = rootNode.radius;
         ApplyNode(newRootNode);
-
-        affectsSeparation = true;
     }
 
     public void CreateMesh(int sideCount, Material material)
@@ -101,16 +96,24 @@ public class Branch : FishDetectable
         }
 
         Debug.Log($"Force {angularVelocity}");
-        if(Mathf.Abs(angularVelocity) > maxVelocity)
+        if (Mathf.Abs(angularVelocity) > maxVelocity)
         {
             angularVelocity = Mathf.Sign(angularVelocity) * maxVelocity;
         }
     }
-    
+
     private void RotateZ(float normalizedAngle, float maxAngle)
     {
-        Debug.Log($"Angle: { maxAngle }");
+        Debug.Log($"Angle: {maxAngle}");
         transform.eulerAngles = new Vector3(0, 0, normalizedAngle * maxAngle);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.TryGetComponent<Fish>(out var fish))
+        {
+            fish.AvoidPoint(transform.position, 1);
+        }
     }
 
     #endregion

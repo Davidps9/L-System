@@ -26,7 +26,6 @@ public class Fish : FishDetectable
         MatchVelocity();
         LimitSpeed();
         KeepWithinBounds();
-        Debug.Log(fishInRange.Count);
         transform.position += velocity * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(velocity);
     }
@@ -63,6 +62,12 @@ public class Fish : FishDetectable
             velocity += (transform.position - fish.transform.position).normalized * simulation.avoidFactor;
         }
     }
+
+    public void AvoidPoint(Vector3 point, float speedMultiplier)
+    {
+        velocity += (transform.position - point).normalized * speedMultiplier;
+    }
+
     #endregion
 
     #region Alignment
