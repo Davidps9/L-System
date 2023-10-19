@@ -10,7 +10,6 @@ public class FishRepellant : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent<Fish>(out var fish))
         {
-            Debug.Log("avoiding");
             fish.AvoidPoint(repellantCollider.ClosestPoint(other.transform.position), speedMultiplier);
         }
     }
