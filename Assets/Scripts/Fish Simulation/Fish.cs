@@ -16,7 +16,7 @@ public class Fish : FishDetectable
 
         this.simulation = simulation;
         velocity = Random.insideUnitSphere * simulation.maxSpeed;
-        GetComponent<SphereCollider>().radius = simulation.visualRange;
+        GetComponent<SphereCollider>().radius = simulation.visualRange / transform.localScale.y;
     }
 
     private void Update()
@@ -104,27 +104,27 @@ public class Fish : FishDetectable
 
     private void KeepWithinBounds()
     {
-        if (transform.position.x > simulation.bounds.x)
+        if (transform.position.x > simulation.transform.position.x + simulation.bounds.x)
         {
             velocity.x -= simulation.turnFactor;
         }
-        if (transform.position.x < -simulation.bounds.x)
+        if (transform.position.x < simulation.transform.position.x - simulation.bounds.x)
         {
             velocity.x += simulation.turnFactor;
         }
-        if (transform.position.y > simulation.bounds.y)
+        if (transform.position.y > simulation.transform.position.y + simulation.bounds.y)
         {
             velocity.y -= simulation.turnFactor;
         }
-        if (transform.position.y < -simulation.bounds.y)
+        if (transform.position.y < simulation.transform.position.y - simulation.bounds.y)
         {
             velocity.y += simulation.turnFactor;
         }
-        if (transform.position.z > simulation.bounds.z)
+        if (transform.position.z > simulation.transform.position.z + simulation.bounds.z)
         {
             velocity.z -= simulation.turnFactor;
         }
-        if (transform.position.z < -simulation.bounds.z)
+        if (transform.position.z < simulation.transform.position.z - simulation.bounds.z)
         {
             velocity.z += simulation.turnFactor;
         }
