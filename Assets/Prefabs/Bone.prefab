@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7736256122403197848}
-  - component: {fileID: 7736256122403197851}
+  - component: {fileID: 2321616254349413581}
   - component: {fileID: 7736256122403197850}
   m_Layer: 0
   m_Name: Bone
@@ -33,8 +33,8 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &7736256122403197851
-CapsuleCollider:
+--- !u!65 &2321616254349413581
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -43,9 +43,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.1
-  m_Height: 1
-  m_Direction: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7736256122403197850
 MonoBehaviour:
@@ -59,5 +58,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e1ea2ca57149a844ac33759420df714, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  repellantCollider: {fileID: 7736256122403197851}
   speedMultiplier: 2
+  repellantWidth: 0.1
+  repellantDepth: 1

@@ -53,6 +53,7 @@ public class InteractiveBody : MonoBehaviour
     };
 
     private Transform kinectPosition;
+    private Dictionary<Kinect.JointType, InteractiveBone> bones = new();
 
     public void Init(GameObject bonePrefab, Transform kinectPosition)
     {
@@ -62,6 +63,14 @@ public class InteractiveBody : MonoBehaviour
         {
             GameObject jointObj = Instantiate(bonePrefab, transform);
             jointObj.name = jt.ToString();
+            if (jointObj.TryGetComponent<InteractiveBone>(out var bone))
+            {
+                bones.Add(jt, bone);
+            }
+            else
+            {
+                Debug.LogError("InteractiveBone script not found in prefab");
+            }
         }
 
         Debug.Log("fwd: " + kinectPosition.forward + ", right: " + kinectPosition.right);
@@ -74,17 +83,14 @@ public class InteractiveBody : MonoBehaviour
             Vector3 firstPosition = GetVector3FromJoint(body.Joints[bone.Key]);
             Vector3 secondPosition = GetVector3FromJoint(body.Joints[bone.Value]);
 
-            Transform jointObj = transform.Find(bone.Key.ToString());
-            if (jointObj == null)
+            if (bones.TryGetValue(bone.Key, out var interactiveBone))
             {
-                Debug.LogWarning("Joint not found: " + bone.Key.ToString());
-                continue;
+                interactiveBone.Refresh(firstPosition, secondPosition);
             }
-            jointObj.localPosition = transform.InverseTransformPoint((firstPosition + secondPosition) / 2.0f);
-            jointObj.localRotation = Quaternion.FromToRotation(Vector3.up, secondPosition - firstPosition);
-
-            CapsuleCollider collider = jointObj.GetComponent<CapsuleCollider>();
-            collider.height = Vector3.Distance(firstPosition, secondPosition);
+            else
+            {
+                Debug.LogError("InteractiveBone not found for " + bone.Key);
+            }
         }
 
         // OLD
