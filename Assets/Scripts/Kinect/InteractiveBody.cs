@@ -65,6 +65,7 @@ public class InteractiveBody : MonoBehaviour
             jointObj.name = jt.ToString();
             if (jointObj.TryGetComponent<InteractiveBone>(out var bone))
             {
+                bone.Init(jt == Kinect.JointType.SpineBase);
                 bones.Add(jt, bone);
             }
             else
