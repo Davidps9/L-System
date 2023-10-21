@@ -2,23 +2,21 @@
 using UnityEngine;
 using Kinect = Windows.Kinect;
 
-[RequireComponent(typeof(KinectDataManager))]
 public class BodyGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject bonePrefab;
-    [SerializeField] private Transform kinectPosition;
-    private Dictionary<ulong, InteractiveBody> _Bodies = new Dictionary<ulong, InteractiveBody>();
-    private KinectDataManager _BodyManager;
+    private Dictionary<ulong, InteractiveBody> bodies = new Dictionary<ulong, InteractiveBody>();
+    private KinectDataManager dataManager;
 
     void Update()
     {
-        _BodyManager = GetComponent<KinectDataManager>();
-        if (_BodyManager == null)
+        dataManager = KinectDataManager.instance;
+        if (dataManager == null)
         {
             return;
         }
 
-        Kinect.Body[] data = _BodyManager.GetData();
+        Kinect.Body[] data = dataManager.GetData();
         if (data == null)
         {
             return;
@@ -38,15 +36,15 @@ public class BodyGenerator : MonoBehaviour
             }
         }
 
-        List<ulong> knownIds = new List<ulong>(_Bodies.Keys);
+        List<ulong> knownIds = new List<ulong>(bodies.Keys);
 
         // First delete untracked bodies
         foreach (ulong trackingId in knownIds)
         {
             if (!trackedIds.Contains(trackingId))
             {
-                Destroy(_Bodies[trackingId].gameObject);
-                _Bodies.Remove(trackingId);
+                Destroy(bodies[trackingId].gameObject);
+                bodies.Remove(trackingId);
             }
         }
 
@@ -59,12 +57,12 @@ public class BodyGenerator : MonoBehaviour
 
             if (body.IsTracked)
             {
-                if (!_Bodies.ContainsKey(body.TrackingId))
+                if (!bodies.ContainsKey(body.TrackingId))
                 {
-                    _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
+                    bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
                 }
 
-                _Bodies[body.TrackingId].Refresh(body);
+                bodies[body.TrackingId].Refresh(body);
             }
         }
     }
@@ -74,7 +72,7 @@ public class BodyGenerator : MonoBehaviour
         GameObject body = new GameObject("Body:" + id);
         body.transform.parent = transform;
         InteractiveBody ib = body.AddComponent<InteractiveBody>();
-        ib.Init(bonePrefab, kinectPosition);
+        ib.Init(bonePrefab, dataManager.kinectPosition);
         return ib;
     }
 }

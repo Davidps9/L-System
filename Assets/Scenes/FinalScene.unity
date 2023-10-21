@@ -524,6 +524,52 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1272063176
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1272063178}
+  - component: {fileID: 1272063177}
+  m_Layer: 0
+  m_Name: Bodies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1272063177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272063176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e61ae98fdfead514b8aedf9b288dce95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bonePrefab: {fileID: 7736256122403197861, guid: 1f369f94ce7d88745b350ef991597e55,
+    type: 3}
+--- !u!4 &1272063178
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272063176}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 33.44135, y: -18.133791, z: 13.817421}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1392181299
 GameObject:
   m_ObjectHideFlags: 0
@@ -668,7 +714,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1706648316}
   - component: {fileID: 1706648315}
-  - component: {fileID: 1706648314}
   m_Layer: 0
   m_Name: KinectManager
   m_TagString: Untagged
@@ -676,21 +721,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1706648314
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1706648313}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e61ae98fdfead514b8aedf9b288dce95, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bonePrefab: {fileID: 7736256122403197861, guid: 1f369f94ce7d88745b350ef991597e55,
-    type: 3}
-  kinectPosition: {fileID: 662918756}
 --- !u!114 &1706648315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -703,6 +733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a63e7535b8fc6f74ea1659ad5e859d0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  kinectPosition: {fileID: 662918756}
 --- !u!4 &1706648316
 Transform:
   m_ObjectHideFlags: 0

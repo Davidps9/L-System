@@ -3,9 +3,12 @@ using Windows.Kinect;
 
 public class KinectDataManager : MonoBehaviour
 {
+    public Transform kinectPosition;
     private KinectSensor _Sensor;
     private BodyFrameReader _Reader;
     private Body[] _Data = null;
+
+    public static KinectDataManager instance;
 
     public Body[] GetData()
     {
@@ -15,6 +18,19 @@ public class KinectDataManager : MonoBehaviour
 
     void Start()
     {
+        // initialize singleton
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        // setup sensor
+
         _Sensor = KinectSensor.GetDefault();
 
         if (_Sensor != null)

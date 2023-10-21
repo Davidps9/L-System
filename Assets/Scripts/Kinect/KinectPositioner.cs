@@ -7,6 +7,16 @@ public class KinectPositioner : MonoBehaviour
     [SerializeField] private float nearPlane = 0.2f;
     [SerializeField] private float farPlane = 5f;
 
+    public void SetPosition(Vector3 position)
+    {
+        transform.position = position;
+    }
+
+    public void SetRotation(Vector3 rotation)
+    {
+        transform.rotation = Quaternion.Euler(rotation);
+    }
+
     private void OnDrawGizmos()
     {
         // Kinect position
