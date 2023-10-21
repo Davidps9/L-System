@@ -79,6 +79,11 @@ public class InteractiveBody : MonoBehaviour
     {
         foreach (KeyValuePair<Kinect.JointType, Kinect.JointType> bone in boneMap)
         {
+            if (body.Joints[bone.Key].TrackingState == 0 || body.Joints[bone.Value].TrackingState == 0)
+            {
+                continue;
+            }
+
             Vector3 firstPosition = GetVector3FromJoint(body.Joints[bone.Key]);
             Vector3 secondPosition = GetVector3FromJoint(body.Joints[bone.Value]);
 

@@ -114,4 +114,4 @@ MonoBehaviour:
   maxAngle: 5
   maxVelocity: 25
   damping: 0.995
-  forceMultiplier: 100
+  forceMultiplier: 50

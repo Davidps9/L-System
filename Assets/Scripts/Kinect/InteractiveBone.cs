@@ -1,11 +1,15 @@
+using UnityEditor;
 using UnityEngine;
 
 public class InteractiveBone : MonoBehaviour
 {
     [Header("Fish repellant options")]
-    [SerializeField] private float speedMultiplier = 2;
-    //[SerializeField] private float repellantWidth = 0.5f;
+    [SerializeField] private float speedMultiplier = 0.1f;
     [SerializeField] private float repellantDepth = 5;
+
+    private Vector3 boneCenter = Vector3.zero;
+    private Vector3 prevBoneCenter = Vector3.zero;
+    private Vector3 velocity = Vector3.zero;
 
     private Collider repellantCollider;
     private LineRenderer lineRenderer;
@@ -20,6 +24,7 @@ public class InteractiveBone : MonoBehaviour
         {
             repellantCollider = gameObject.AddComponent<CapsuleCollider>();
         }
+        repellantCollider.isTrigger = true;
 
         // DEBUG LINE
         lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -36,35 +41,42 @@ public class InteractiveBone : MonoBehaviour
         // debug line
         lineRenderer.SetPositions(new Vector3[] { firstPosition, secondPosition });
 
-        Vector3 frontCenter = (firstPosition + secondPosition) * 0.5f;
+        prevBoneCenter = boneCenter;
+        boneCenter = (firstPosition + secondPosition) * 0.5f;
+        velocity = (boneCenter - prevBoneCenter) / Time.deltaTime;
+
         float radius = Vector3.Distance(firstPosition, secondPosition) / 2;
 
         if (repellantCollider is CapsuleCollider)
         {
             CapsuleCollider capsuleCollider = repellantCollider as CapsuleCollider;
 
-            Vector3 thirdPosition = GetCameraPointAtDepth(frontCenter, repellantDepth);
-            Vector3 center = (frontCenter + thirdPosition) * 0.5f;
-            float height = Vector3.Distance(frontCenter, thirdPosition);
+            Vector3 thirdPosition = GetCameraPointAtDepth(boneCenter, repellantDepth);
+            Vector3 colliderCenter = (boneCenter + thirdPosition) * 0.5f;
+            float height = Vector3.Distance(boneCenter, thirdPosition);
 
             capsuleCollider.radius = radius;
             capsuleCollider.height = height;
-            transform.position = center;
-            transform.rotation = Quaternion.FromToRotation(Vector3.up, thirdPosition - frontCenter);
+            transform.position = colliderCenter;
+            transform.rotation = Quaternion.FromToRotation(Vector3.up, thirdPosition - boneCenter);
         }
         else if (repellantCollider is SphereCollider)
         {
             SphereCollider sphereCollider = repellantCollider as SphereCollider;
             sphereCollider.radius = radius;
-            transform.position = frontCenter;
+            transform.position = boneCenter;
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.TryGetComponent<Fish>(out var fish))
+        if (other.gameObject.TryGetComponent<Branch>(out var branch))
         {
-            fish.AvoidPoint(repellantCollider.ClosestPoint(other.transform.position), speedMultiplier);
+            branch.ApplyForce(velocity);
+        }
+        else if (other.gameObject.TryGetComponent<Fish>(out var fish))
+        {
+            fish.AvoidPoint(repellantCollider.ClosestPoint(other.transform.position), velocity.magnitude * speedMultiplier);
         }
     }
 
@@ -75,5 +87,10 @@ public class InteractiveBone : MonoBehaviour
         Vector3 newPoint = Camera.main.ScreenToWorldPoint(screenPoint);
 
         return newPoint;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Handles.Label(boneCenter, velocity.ToString());
     }
 }
