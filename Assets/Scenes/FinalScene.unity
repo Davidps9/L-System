@@ -368,15 +368,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6123d559179be234d840d399baeae06d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchingFactor: 0.0339
-  minDistance: 0.2
-  avoidFactor: 0.05
-  centeringFactor: 0.00386
+  matchingFactor: 0.003
+  minDistance: 0.1
+  avoidFactor: 0.000384
+  centeringFactor: 0.0000224
   bounds: {x: 5, y: 2, z: 5}
-  turnFactor: 0.18
-  visualRange: 0.5
+  turnFactor: 0.082
+  visualRange: 0.3
   maxSpeed: 5
-  fishCount: 100
+  fishCount: 150
   fishPrefab: {fileID: 6230784100627652452, guid: 6d84e338ce5fdb142b84cbd3f74bfe49,
     type: 3}
 --- !u!4 &780785812
@@ -387,7 +387,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780785810}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 5.5}
+  m_LocalPosition: {x: 0, y: 2.5, z: 5.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

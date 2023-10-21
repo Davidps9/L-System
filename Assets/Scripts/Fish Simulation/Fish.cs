@@ -63,9 +63,9 @@ public class Fish : FishDetectable
         }
     }
 
-    public void AvoidPoint(Vector3 point, float speedMultiplier)
+    public void AvoidPoint(Vector3 point, float avoidFactor)
     {
-        velocity += (transform.position - point).normalized * speedMultiplier;
+        velocity += (transform.position - point).normalized * avoidFactor;
     }
 
     #endregion

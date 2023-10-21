@@ -112,7 +112,7 @@ public class Branch : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent<Fish>(out var fish))
         {
-            fish.AvoidPoint(transform.position, 1);
+            fish.AvoidPoint(transform.position, 0.5f);
         }
     }
 

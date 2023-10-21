@@ -5,12 +5,12 @@ using UnityEngine;
 public class FishSimulation : MonoBehaviour
 {
     [Header("Alignment")]
-    [Range(0f, 0.1f)] public float matchingFactor = 0.05f; // alignment
+    [Range(0f, 0.01f)] public float matchingFactor = 0.005f; // alignment
     [Header("Separation")]
     public float minDistance = 1f;
-    [Range(0f, 0.1f)] public float avoidFactor = 0.05f; // separation
+    [Range(0f, 0.001f)] public float avoidFactor = 0.0005f; // separation
     [Header("Cohesion")]
-    [Range(0f, 0.01f)] public float centeringFactor = 0.005f; // cohesion
+    [Range(0f, 0.0001f)] public float centeringFactor = 0.00005f; // cohesion
     [Header("Bounds")]
     public Vector3 bounds = Vector3.one;
     [Range(0, 1)] public float turnFactor = 1;
