@@ -14,7 +14,7 @@ public class FrustumGizmo : MonoBehaviour
         cam = GetComponent<Camera>();
         var frustumHeight = 2.0f * nearPlane * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
         var frustumWidth = frustumHeight * cam.aspect;
-        Debug.Log("Frustum size at " + nearPlane + "m -> " + frustumWidth + "m x " + frustumHeight + "m");
+        Debug.Log(cam.name + " frustum size at " + nearPlane + "m -> " + frustumWidth + "m x " + frustumHeight + "m");
     }
 
     private void OnDrawGizmos()

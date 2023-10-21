@@ -43,6 +43,12 @@ public class L_System : MonoBehaviour
     [SerializeField] private float numberOfStages;
     [SerializeField] private int sideCount;
     [SerializeField] private Material material;
+
+#if UNITY_EDITOR
+    [Header("Debug")]
+    [SerializeField] private bool showProgress = false;
+#endif
+
     private float iterations = 1;
     private string sentence = "", previousSentence = "";
     private List<Branch> pushedBranches = new();
@@ -164,12 +170,15 @@ public class L_System : MonoBehaviour
                     break;
             }
 
-            count++;
-            Debug.Log("Iteration " + iterations + " progress: " + 100.0f * count / workingSentence.Length + "%");
-
+#if UNITY_EDITOR
+            if (showProgress)
+            {
+                count++;
+                Debug.Log("Iteration " + iterations + " progress: " + 100.0f * count / workingSentence.Length + "%");
+            }
+#endif
         }
         pushedBranches.Last().CreateMesh(sideCount, material);
-        //yield return new WaitForSeconds(1);
 
         // cleanup extra iterations
         if (transform.childCount > 1)
@@ -208,20 +217,5 @@ public class L_System : MonoBehaviour
         }
 
         TurtleConversion();
-    }
-
-
-    void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.A))
-        //{
-        //    foreach (Transform child in transform)
-        //    {
-        //        Destroy(child.gameObject);
-        //    }
-
-        //    TurtleConversion();
-        //    Debug.Log(sentence);
-        //}
     }
 }

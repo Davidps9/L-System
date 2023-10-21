@@ -72,8 +72,6 @@ public class InteractiveBody : MonoBehaviour
                 Debug.LogError("InteractiveBone script not found in prefab");
             }
         }
-
-        Debug.Log("fwd: " + kinectPosition.forward + ", right: " + kinectPosition.right);
     }
 
     public void Refresh(Kinect.Body body)
