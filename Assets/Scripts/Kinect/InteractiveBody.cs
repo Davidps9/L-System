@@ -29,6 +29,8 @@ public class InteractiveBody : MonoBehaviour
     private float velocityThreshold = 1f;
     private float stillTime = 2f;
 
+    private HandIndicator leftHandIndicator, rightHandIndicator;
+
     private Vector3 leftHandPos = Vector3.zero, leftHandPrevPos = Vector3.zero;
     private Vector3 leftHandVelocity = Vector3.zero;
     private Kinect.HandState leftHandState = Kinect.HandState.Unknown;
@@ -37,7 +39,7 @@ public class InteractiveBody : MonoBehaviour
     private Vector3 rightHandVelocity = Vector3.zero;
     private Kinect.HandState rightHandState = Kinect.HandState.Unknown;
 
-    public void Init(ulong id, GameObject bonePrefab, float velocityThreshold, float stillTime)
+    public void Init(ulong id, GameObject bonePrefab, GameObject handIndicatorPrefab, float velocityThreshold, float stillTime)
     {
         this.id = id;
         this.velocityThreshold = velocityThreshold;
@@ -57,6 +59,12 @@ public class InteractiveBody : MonoBehaviour
                 Debug.LogError("InteractiveBone script not found in prefab");
             }
         }
+
+        // spawn hand indicators
+        leftHandIndicator = Instantiate(handIndicatorPrefab, transform).GetComponent<HandIndicator>();
+        leftHandIndicator.SetSide(true);
+        rightHandIndicator = Instantiate(handIndicatorPrefab, transform).GetComponent<HandIndicator>();
+        rightHandIndicator.SetSide(false);
     }
 
     public void Refresh(Kinect.Body body)
@@ -66,19 +74,20 @@ public class InteractiveBody : MonoBehaviour
         rightHandState = body.HandRightState;
 
         leftHandPrevPos = leftHandPos;
-        leftHandPos = KinectDataManager.GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+        leftHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
         if (leftHandPos != leftHandPrevPos)
         {
             leftHandVelocity = (leftHandPos - leftHandPrevPos) / Time.deltaTime;
         }
 
         rightHandPrevPos = rightHandPos;
-        rightHandPos = KinectDataManager.GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]);
+        rightHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[Kinect.JointType.HandRight]);
         if (rightHandPos != rightHandPrevPos)
         {
             rightHandVelocity = (rightHandPos - rightHandPrevPos) / Time.deltaTime;
         }
 
+        UpdateHandIndicators();
         TryGenerateLSystem();
 
         // lean
@@ -109,6 +118,19 @@ public class InteractiveBody : MonoBehaviour
         }
     }
 
+    private void UpdateHandIndicators()
+    {
+        if (leftHandState != Kinect.HandState.Unknown)
+        {
+            leftHandIndicator.SnapTo(leftHandPos);
+        }
+
+        if (rightHandState != Kinect.HandState.Unknown)
+        {
+            rightHandIndicator.SnapTo(rightHandPos);
+        }
+    }
+
     private float timer = 0;
     private void TryGenerateLSystem()
     {
@@ -120,7 +142,10 @@ public class InteractiveBody : MonoBehaviour
                 if (leftHandState == Kinect.HandState.Open && rightHandState == Kinect.HandState.Open)
                 {
                     timer += Time.deltaTime;
-                    Debug.Log(timer / stillTime);
+
+                    leftHandIndicator.SetFill(timer / stillTime);
+                    rightHandIndicator.SetFill(timer / stillTime);
+                    return;
                 }
             }
             else
@@ -130,11 +155,13 @@ public class InteractiveBody : MonoBehaviour
                     timer = 0;
                     LSystemGenerator.instance.Generate(bones[Kinect.JointType.SpineBase].transform.position, lean, "L-System:" + id);
                 }
+                return;
             }
         }
-        else
-        {
-            timer = 0;
-        }
+
+        timer = 0;
+
+        leftHandIndicator.SetFill(0);
+        rightHandIndicator.SetFill(0);
     }
 }

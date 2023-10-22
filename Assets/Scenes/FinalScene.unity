@@ -548,6 +548,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bonePrefab: {fileID: 7736256122403197861, guid: 1f369f94ce7d88745b350ef991597e55,
     type: 3}
+  handIndicatorPrefab: {fileID: 4381640073782457964, guid: 340e5a341bf993844bd04456266c06eb,
+    type: 3}
   velocityThreshold: 5
   stillTime: 3
 --- !u!4 &1272063178
