@@ -1,40 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Kinect = Windows.Kinect;
 
 public class InteractiveBody : MonoBehaviour
 {
-    //private static readonly Dictionary<Kinect.JointType, Kinect.JointType> boneMap = new()
-    //{
-    //    { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
-    //    { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
-    //    { Kinect.JointType.KneeLeft, Kinect.JointType.HipLeft },
-    //    { Kinect.JointType.HipLeft, Kinect.JointType.SpineBase },
-
-    //    { Kinect.JointType.FootRight, Kinect.JointType.AnkleRight },
-    //    { Kinect.JointType.AnkleRight, Kinect.JointType.KneeRight },
-    //    { Kinect.JointType.KneeRight, Kinect.JointType.HipRight },
-    //    { Kinect.JointType.HipRight, Kinect.JointType.SpineBase },
-
-    //    { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
-    //    { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
-    //    { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
-    //    { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
-    //    { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
-    //    { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
-
-    //    { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
-    //    { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
-    //    { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
-    //    { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
-    //    { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
-    //    { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
-
-    //    { Kinect.JointType.SpineBase, Kinect.JointType.SpineMid },
-    //    { Kinect.JointType.SpineMid, Kinect.JointType.SpineShoulder },
-    //    { Kinect.JointType.SpineShoulder, Kinect.JointType.Neck },
-    //    { Kinect.JointType.Neck, Kinect.JointType.Head },
-    //};
     private static readonly Dictionary<Kinect.JointType, Kinect.JointType> boneMap = new()
     {
         { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
@@ -52,12 +22,26 @@ public class InteractiveBody : MonoBehaviour
         { Kinect.JointType.SpineBase, Kinect.JointType.SpineShoulder },
     };
 
-    private Transform kinectPosition;
+    [NonSerialized] public ulong id;
     private Dictionary<Kinect.JointType, InteractiveBone> bones = new();
+    private Vector2 lean = Vector2.zero;
 
-    public void Init(GameObject bonePrefab, Transform kinectPosition)
+    private float velocityThreshold = 1f;
+    private float stillTime = 2f;
+
+    private Vector3 leftHandPos = Vector3.zero, leftHandPrevPos = Vector3.zero;
+    private Vector3 leftHandVelocity = Vector3.zero;
+    private Kinect.HandState leftHandState = Kinect.HandState.Unknown;
+
+    private Vector3 rightHandPos = Vector3.zero, rightHandPrevPos = Vector3.zero;
+    private Vector3 rightHandVelocity = Vector3.zero;
+    private Kinect.HandState rightHandState = Kinect.HandState.Unknown;
+
+    public void Init(ulong id, GameObject bonePrefab, float velocityThreshold, float stillTime)
     {
-        this.kinectPosition = kinectPosition;
+        this.id = id;
+        this.velocityThreshold = velocityThreshold;
+        this.stillTime = stillTime;
 
         foreach (Kinect.JointType jt in boneMap.Keys)
         {
@@ -77,6 +61,33 @@ public class InteractiveBody : MonoBehaviour
 
     public void Refresh(Kinect.Body body)
     {
+        // hands
+        leftHandState = body.HandLeftState;
+        rightHandState = body.HandRightState;
+
+        leftHandPrevPos = leftHandPos;
+        leftHandPos = KinectDataManager.GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+        if (leftHandPos != leftHandPrevPos)
+        {
+            leftHandVelocity = (leftHandPos - leftHandPrevPos) / Time.deltaTime;
+        }
+
+        rightHandPrevPos = rightHandPos;
+        rightHandPos = KinectDataManager.GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]);
+        if (rightHandPos != rightHandPrevPos)
+        {
+            rightHandVelocity = (rightHandPos - rightHandPrevPos) / Time.deltaTime;
+        }
+
+        TryGenerateLSystem();
+
+        // lean
+        if (body.LeanTrackingState > 0)
+        {
+            lean = new Vector2(body.Lean.X, body.Lean.Y);
+        }
+
+        // Create bones
         foreach (KeyValuePair<Kinect.JointType, Kinect.JointType> bone in boneMap)
         {
             if (body.Joints[bone.Key].TrackingState == 0 || body.Joints[bone.Value].TrackingState == 0)
@@ -84,8 +95,8 @@ public class InteractiveBody : MonoBehaviour
                 continue;
             }
 
-            Vector3 firstPosition = GetVector3FromJoint(body.Joints[bone.Key]);
-            Vector3 secondPosition = GetVector3FromJoint(body.Joints[bone.Value]);
+            Vector3 firstPosition = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[bone.Key]);
+            Vector3 secondPosition = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[bone.Value]);
 
             if (bones.TryGetValue(bone.Key, out var interactiveBone))
             {
@@ -96,54 +107,34 @@ public class InteractiveBody : MonoBehaviour
                 Debug.LogError("InteractiveBone not found for " + bone.Key);
             }
         }
-
-        // OLD
-        //for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
-        //{
-        //    Kinect.Joint sourceJoint = body.Joints[jt];
-        //    Kinect.Joint? targetJoint = null;
-
-        //    if (boneMap.ContainsKey(jt))
-        //    {
-        //        targetJoint = body.Joints[boneMap[jt]];
-        //    }
-
-        //    Transform jointObj = transform.Find(jt.ToString());
-        //    jointObj.localPosition = GetVector3FromJoint(sourceJoint);
-
-        //    LineRenderer lr = jointObj.GetComponent<LineRenderer>();
-        //    if (targetJoint.HasValue)
-        //    {
-        //        lr.SetPosition(0, jointObj.localPosition);
-        //        lr.SetPosition(1, GetVector3FromJoint(targetJoint.Value));
-        //        lr.startColor = GetColorForState(sourceJoint.TrackingState);
-        //        lr.endColor = GetColorForState(targetJoint.Value.TrackingState);
-        //    }
-        //    else
-        //    {
-        //        lr.enabled = false;
-        //    }
-        //}
     }
 
-    private static Color GetColorForState(Kinect.TrackingState state)
+    private float timer = 0;
+    private void TryGenerateLSystem()
     {
-        switch (state)
+        float adjustedThreshold = velocityThreshold * ((timer / stillTime) + 1);
+        if (leftHandVelocity.magnitude < adjustedThreshold && rightHandVelocity.magnitude < adjustedThreshold)
         {
-            case Kinect.TrackingState.Tracked:
-                return Color.green;
-
-            case Kinect.TrackingState.Inferred:
-                return Color.red;
-
-            default:
-                return Color.black;
+            if (timer < stillTime)
+            {
+                if (leftHandState == Kinect.HandState.Open && rightHandState == Kinect.HandState.Open)
+                {
+                    timer += Time.deltaTime;
+                    Debug.Log(timer / stillTime);
+                }
+            }
+            else
+            {
+                if (leftHandState == Kinect.HandState.Closed && rightHandState == Kinect.HandState.Closed)
+                {
+                    timer = 0;
+                    LSystemGenerator.instance.Generate(bones[Kinect.JointType.SpineBase].transform.position, lean, "L-System:" + id);
+                }
+            }
         }
-    }
-
-    private Vector3 GetVector3FromJoint(Kinect.Joint joint)
-    {
-        Vector3 worldPos = kinectPosition.TransformPoint(-joint.Position.X, joint.Position.Y, joint.Position.Z);
-        return new Vector3(worldPos.x, worldPos.y, -worldPos.z);
+        else
+        {
+            timer = 0;
+        }
     }
 }

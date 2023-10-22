@@ -43,7 +43,10 @@ public class InteractiveBone : MonoBehaviour
 
         prevBoneCenter = boneCenter;
         boneCenter = (firstPosition + secondPosition) * 0.5f;
-        velocity = (boneCenter - prevBoneCenter) / Time.deltaTime;
+        if (boneCenter != prevBoneCenter)
+        {
+            velocity = (boneCenter - prevBoneCenter) / Time.deltaTime;
+        }
 
         float radius = Vector3.Distance(firstPosition, secondPosition) / 2;
 

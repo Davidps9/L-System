@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Windows.Kinect;
+using Joint = Windows.Kinect.Joint;
 
 public class KinectDataManager : MonoBehaviour
 {
@@ -81,5 +82,16 @@ public class KinectDataManager : MonoBehaviour
 
             _Sensor = null;
         }
+    }
+
+    public static Vector3 GetVector3FromJoint(Joint joint)
+    {
+        return new Vector3(joint.Position.X, joint.Position.Y, joint.Position.Z);
+    }
+
+    public Vector3 GetMirroredVector3FromJoint(Joint joint)
+    {
+        Vector3 worldPos = kinectPosition.TransformPoint(-joint.Position.X, joint.Position.Y, joint.Position.Z);
+        return new Vector3(worldPos.x, worldPos.y, -worldPos.z);
     }
 }

@@ -239,6 +239,50 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!1 &535196796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 535196798}
+  - component: {fileID: 535196797}
+  m_Layer: 0
+  m_Name: L-SystemGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &535196797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535196796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec187cee5b3096a4182137e2cefb25a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &535196798
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535196796}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &662918755
 GameObject:
   m_ObjectHideFlags: 0
@@ -286,59 +330,6 @@ MonoBehaviour:
   fov: 60
   nearPlane: 0.2
   farPlane: 5
---- !u!1 &682025592
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 682025594}
-  - component: {fileID: 682025593}
-  m_Layer: 3
-  m_Name: L-System
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &682025593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 682025592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac5f3516a40b140448d662d673256186, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ruleset: {fileID: 11400000, guid: fbde5c72708a53e4987f763e1d9802aa, type: 2}
-  procedurallyGenerate: 0
-  branchPrefab: {fileID: 2392352463464731594, guid: e93cf6aff2682014588d9ae3d5c73ba1,
-    type: 3}
-  radius: 0.01
-  numberOfStages: 3
-  sideCount: 6
-  material: {fileID: 2100000, guid: eea8355132e5dc4438f496fb64ef7f4b, type: 2}
-  showProgress: 0
---- !u!4 &682025594
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 682025592}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.99}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &780785810
 GameObject:
   m_ObjectHideFlags: 0
@@ -522,7 +513,7 @@ Transform:
   m_Children:
   - {fileID: 868375736}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1272063176
 GameObject:
@@ -535,7 +526,7 @@ GameObject:
   - component: {fileID: 1272063178}
   - component: {fileID: 1272063177}
   m_Layer: 0
-  m_Name: Bodies
+  m_Name: BodyGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -555,6 +546,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bonePrefab: {fileID: 7736256122403197861, guid: 1f369f94ce7d88745b350ef991597e55,
     type: 3}
+  velocityThreshold: 5
+  stillTime: 3
 --- !u!4 &1272063178
 Transform:
   m_ObjectHideFlags: 0
@@ -568,7 +561,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1392181299
 GameObject:

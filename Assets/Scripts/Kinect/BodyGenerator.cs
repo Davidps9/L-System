@@ -5,6 +5,11 @@ using Kinect = Windows.Kinect;
 public class BodyGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject bonePrefab;
+
+    [Header("L-System Generation")]
+    [SerializeField] private float velocityThreshold = 1f;
+    [SerializeField] private float stillTime = 2f;
+
     private Dictionary<ulong, InteractiveBody> bodies = new Dictionary<ulong, InteractiveBody>();
     private KinectDataManager dataManager;
 
@@ -72,7 +77,7 @@ public class BodyGenerator : MonoBehaviour
         GameObject body = new GameObject("Body:" + id);
         body.transform.parent = transform;
         InteractiveBody ib = body.AddComponent<InteractiveBody>();
-        ib.Init(bonePrefab, dataManager.kinectPosition);
+        ib.Init(id, bonePrefab, velocityThreshold, stillTime);
         return ib;
     }
 }

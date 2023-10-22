@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class L_System : MonoBehaviour
+public class LSystem : MonoBehaviour
 {
 
     /*
@@ -35,7 +35,6 @@ public class L_System : MonoBehaviour
      * */
     [Header("L-System Parameters")]
     [SerializeField] private Ruleset ruleset;
-    [SerializeField] private bool procedurallyGenerate = false;
     [SerializeField] private GameObject branchPrefab;
 
     [Header("Rendering Parameters")]
@@ -53,9 +52,18 @@ public class L_System : MonoBehaviour
     private string sentence = "", previousSentence = "";
     private List<Branch> pushedBranches = new();
 
-    void Start()
+    private void Start()
     {
-        GenerateLSystem();
+        if (ruleset != null)
+        {
+            GenerateLSystem(ruleset);
+        }
+    }
+
+    public void GenerateLSystem(Ruleset ruleset)
+    {
+        this.ruleset = ruleset;
+        TurtleConversion();
     }
 
     private void TurtleConversion()
@@ -207,15 +215,5 @@ public class L_System : MonoBehaviour
 
         Debug.LogError("The prefab does not have a Branch script attached to it.");
         return null;
-    }
-
-    public void GenerateLSystem()
-    {
-        if (procedurallyGenerate)
-        {
-            ruleset = ProceduralGenerator.GenerateRuleSet(10, new Vector2(25, 45));
-        }
-
-        TurtleConversion();
     }
 }
