@@ -155,12 +155,14 @@ MonoBehaviour:
   prefab: {fileID: 1776253691}
   parent: {fileID: 1938491891}
   Highlight: {fileID: 2100000, guid: eea8355132e5dc4438f496fb64ef7f4b, type: 2}
-  numOfPoints: 750
+  numOfPoints: 1000
   turnFraction: 1.618034
-  positionDistance: 50
+  turnFractionSpeed: 0.000015
+  radius: 20
   highlightOffset: 2
   highlightValue: 2
-  powPower: 0.5
+  cameraObj: {fileID: 688294800}
+  angle: 0.1
 --- !u!4 &313534928
 Transform:
   m_ObjectHideFlags: 0
@@ -328,7 +330,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.756942, g: 0.7927643, b: 0.8490566, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -369,7 +371,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 688294800}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -65}
+  m_LocalPosition: {x: 0, y: 1, z: -50}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
