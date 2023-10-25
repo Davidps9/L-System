@@ -32,8 +32,7 @@ public class AvoidanceAdvancedSystem : MonoBehaviour
             float t = i*fovOffset / (numOfPoints - 1f);
             float inclination = Mathf.Acos(1 - 2 * t);
             float azimuth = 2 * Mathf.PI * turnFraction * i;
-            Debug.Log("inclination: "+ inclination);
-            Debug.Log("azimuth: "+ azimuth);
+
             float x = Mathf.Sin(inclination) * Mathf.Cos(azimuth);
             float y = Mathf.Sin(inclination) * Mathf.Sin(azimuth);
             float z = Mathf.Cos(inclination);
