@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 303355007496708391}
   - component: {fileID: 7389425589977281936}
   - component: {fileID: 9021308842582562295}
+  - component: {fileID: 6576993973223416075}
   m_Layer: 0
   m_Name: Fish
   m_TagString: Untagged
@@ -97,7 +98,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &7389425589977281936
 Rigidbody:
@@ -127,3 +128,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc44f46187bd4424298222d4c6783960, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6576993973223416075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6230784100627652452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 604c2063dbdf97d428a4d6d305faea10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numOfPoints: 100
+  turnFraction: 1.618034
+  fovOffset: 0.5
+  positionDistance: 0.3

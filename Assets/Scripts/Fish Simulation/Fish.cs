@@ -7,20 +7,22 @@ public class Fish : FishDetectable
 {
     private FishSimulation simulation;
     private List<FishDetectable> fishInRange = new();
-
+    AvoidanceAdvancedSystem script;
     public void Init(FishSimulation simulation)
     {
+        script = GetComponent<AvoidanceAdvancedSystem>();
+
         affectsAlignment = true;
         affectsSeparation = true;
         affectsCohesion = true;
 
         this.simulation = simulation;
         velocity = Random.insideUnitSphere * simulation.maxSpeed;
-        GetComponent<SphereCollider>().radius = simulation.visualRange / transform.localScale.y;
     }
 
     private void Update()
     {
+        DetectFish();
         FlyTowardsCenter();
         AvoidOthers();
         MatchVelocity();
@@ -28,6 +30,22 @@ public class Fish : FishDetectable
         KeepWithinBounds();
         transform.position += velocity * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(velocity);
+    }
+
+    void DetectFish()
+    {
+        fishInRange.Clear();
+        RaycastHit[] hits = script.DetectObstacles();
+        if(hits.Length > 0)
+        {
+            foreach(RaycastHit hit in hits)
+            {
+                if(hit.collider.gameObject.TryGetComponent<Fish>(out Fish fish))
+                {
+                    fishInRange.Add(fish);
+                }
+            }
+        }
     }
 
     #region Cohesion
@@ -132,21 +150,5 @@ public class Fish : FishDetectable
 
     #endregion
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.TryGetComponent(out Fish fish))
-        {
-            if (fishInRange.Contains(fish)) { return; }
-            fishInRange.Add(fish);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.TryGetComponent(out Fish fish))
-        {
-            if (!fishInRange.Contains(fish)) { return; }
-            fishInRange.Remove(fish);
-        }
-    }
+    
 }
