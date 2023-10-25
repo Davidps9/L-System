@@ -132,7 +132,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 313534928}
-  - component: {fileID: 313534927}
+  - component: {fileID: 313534929}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -140,27 +140,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &313534927
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 313534926}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e29c7952882102141a315c1613e92997, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefab: {fileID: 1776253691}
-  parent: {fileID: 1938491891}
-  Highlight: {fileID: 2100000, guid: eea8355132e5dc4438f496fb64ef7f4b, type: 2}
-  numOfPoints: 750
-  turnFraction: 1.618034
-  positionDistance: 50
-  highlightOffset: 2
-  highlightValue: 2
-  powPower: 0.5
 --- !u!4 &313534928
 Transform:
   m_ObjectHideFlags: 0
@@ -176,6 +155,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &313534929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 313534926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 604c2063dbdf97d428a4d6d305faea10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 1938491891}
+  numOfPoints: 120
+  turnFraction: 1.618034
+  fovOffset: 0.5
+  positionDistance: 15
 --- !u!1 &314750926
 GameObject:
   m_ObjectHideFlags: 0

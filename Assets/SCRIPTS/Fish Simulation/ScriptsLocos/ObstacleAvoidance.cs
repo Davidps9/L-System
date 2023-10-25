@@ -73,6 +73,7 @@ public class ObstacleAvoidance : MonoBehaviour
             float z = Mathf.Cos(inclination) * positionDistance;
 
             Vector3 pos = new Vector3(x, y, z);
+            Debug.DrawRay(parent.transform.position, pos, Color.green);
 
             UpdatePsition(i, pos);
         }
