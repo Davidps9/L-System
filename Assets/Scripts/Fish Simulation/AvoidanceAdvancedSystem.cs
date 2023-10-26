@@ -11,8 +11,8 @@ public class AvoidanceAdvancedSystem : MonoBehaviour
     [SerializeField] int numOfPoints;
     [SerializeField] float turnFraction;
     [SerializeField] float fovOffset;
-    [SerializeField] float positionDistance;
-    private List<Vector3> pos = new List<Vector3>();
+    public float positionDistance;
+    [HideInInspector]public List<Vector3> pos = new List<Vector3>();
     //[SerializeField] float highlightOffset;
     //[SerializeField] float highlightValue;
     //[SerializeField] float powPower;
@@ -35,7 +35,7 @@ public class AvoidanceAdvancedSystem : MonoBehaviour
 
             float x = Mathf.Sin(inclination) * Mathf.Cos(azimuth);
             float y = Mathf.Sin(inclination) * Mathf.Sin(azimuth);
-            float z = Mathf.Cos(inclination);
+            float z = -Mathf.Cos(inclination);
 
             pos.Add(new Vector3(x, y, z));
 
@@ -51,7 +51,6 @@ public class AvoidanceAdvancedSystem : MonoBehaviour
             if(Physics.Raycast(parent.transform.position, pos[i], out RaycastHit hit, positionDistance))
             {
                 rays.Add(hit);
-                Debug.DrawRay(parent.transform.position, pos[i] * positionDistance, Color.red);
 
             }
             
