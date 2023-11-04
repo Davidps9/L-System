@@ -23,6 +23,7 @@ public class InteractiveBody : MonoBehaviour
     };
 
     [NonSerialized] public ulong id;
+    private Dictionary<Kinect.JointType, Kinect.Joint> joints;
     private Dictionary<Kinect.JointType, InteractiveBone> bones = new();
     private Vector2 lean = Vector2.zero;
 
@@ -69,19 +70,21 @@ public class InteractiveBody : MonoBehaviour
 
     public void Refresh(Kinect.Body body)
     {
+        joints = body.Joints;
+
         // hands
         leftHandState = body.HandLeftState;
         rightHandState = body.HandRightState;
 
         leftHandPrevPos = leftHandPos;
-        leftHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+        leftHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(joints[Kinect.JointType.HandLeft]);
         if (leftHandPos != leftHandPrevPos)
         {
             leftHandVelocity = (leftHandPos - leftHandPrevPos) / Time.deltaTime;
         }
 
         rightHandPrevPos = rightHandPos;
-        rightHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[Kinect.JointType.HandRight]);
+        rightHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(joints[Kinect.JointType.HandRight]);
         if (rightHandPos != rightHandPrevPos)
         {
             rightHandVelocity = (rightHandPos - rightHandPrevPos) / Time.deltaTime;
@@ -99,13 +102,13 @@ public class InteractiveBody : MonoBehaviour
         // Create bones
         foreach (KeyValuePair<Kinect.JointType, Kinect.JointType> bone in boneMap)
         {
-            if (body.Joints[bone.Key].TrackingState == 0 || body.Joints[bone.Value].TrackingState == 0)
+            if (joints[bone.Key].TrackingState == 0 || joints[bone.Value].TrackingState == 0)
             {
                 continue;
             }
 
-            Vector3 firstPosition = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[bone.Key]);
-            Vector3 secondPosition = KinectDataManager.instance.GetMirroredVector3FromJoint(body.Joints[bone.Value]);
+            Vector3 firstPosition = KinectDataManager.instance.GetMirroredVector3FromJoint(joints[bone.Key]);
+            Vector3 secondPosition = KinectDataManager.instance.GetMirroredVector3FromJoint(joints[bone.Value]);
 
             if (bones.TryGetValue(bone.Key, out var interactiveBone))
             {

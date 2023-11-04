@@ -1,35 +1,26 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AvoidanceAdvancedSystem : MonoBehaviour
 {
-    //[SerializeField] GameObject prefab;
-    private GameObject parent;
-    //[SerializeField] Material Highlight;
     [Header("Math Components")]
     [SerializeField] int numOfPoints;
     [SerializeField] float turnFraction;
     [SerializeField] float fovOffset;
     public float positionDistance;
-    [HideInInspector]public List<Vector3> pos = new List<Vector3>();
-    //[SerializeField] float highlightOffset;
-    //[SerializeField] float highlightValue;
-    //[SerializeField] float powPower;
-    //private List<GameObject> obstacles = new List<GameObject>();
-    // Start is called before the first frame update
+    [HideInInspector] public List<Vector3> pos = new List<Vector3>();
+
     void Start()
     {
-        parent = gameObject;
         GenerateFOV();
     }
 
     void GenerateFOV()
     {
 
-        for (int i = 0; i < numOfPoints ; i++)
+        for (int i = 0; i < numOfPoints; i++)
         {
-            float t = i*fovOffset / (numOfPoints - 1f);
+            float t = i * fovOffset / (numOfPoints - 1f);
             float inclination = Mathf.Acos(1 - 2 * t);
             float azimuth = 2 * Mathf.PI * turnFraction * i;
 
@@ -42,20 +33,27 @@ public class AvoidanceAdvancedSystem : MonoBehaviour
         }
     }
 
-    public RaycastHit[] DetectObstacles()
+    public Vector3 GetFreeDirection()
     {
-        List<RaycastHit> rays = new List<RaycastHit>();
-        for (int i = 0; i < numOfPoints; i++)
+        for (int i = 0; i < pos.Count; i++)
         {
-
-            if(Physics.Raycast(parent.transform.position, pos[i], out RaycastHit hit, positionDistance))
+            Vector3 dir = transform.TransformDirection(pos[i]);
+            Ray ray = new Ray(transform.position, dir);
+            if (!Physics.SphereCast(ray, 0.01f, positionDistance * 5, 0))
             {
-                rays.Add(hit);
+                Debug.DrawRay(transform.position, dir, Color.red);
 
+                return dir;
             }
-            
         }
-        return rays.ToArray();
+        return transform.forward;
     }
-
+    public bool IsHeadingForCollision()
+    {
+        if (Physics.SphereCast(transform.position, 0.1f, transform.forward, out _, positionDistance, 0))
+        {
+            return true;
+        }
+        return false;
+    }
 }

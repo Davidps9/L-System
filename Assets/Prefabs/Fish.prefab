@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7389425589977281936}
   - component: {fileID: 9021308842582562295}
   - component: {fileID: 6576993973223416075}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fish
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,3 +144,4 @@ MonoBehaviour:
   turnFraction: 1.618034
   fovOffset: 0.5
   positionDistance: 0.3
+  pos: []

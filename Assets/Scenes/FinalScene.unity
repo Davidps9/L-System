@@ -361,10 +361,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6123d559179be234d840d399baeae06d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchingFactor: 0.003
+  matchingFactor: 0.001
   minDistance: 0.1
   avoidFactor: 0.000384
-  centeringFactor: 0.0000224
+  centeringFactor: 0.0000124
   bounds: {x: 5, y: 2, z: 3}
   turnFactor: 0.082
   visualRange: 0.3

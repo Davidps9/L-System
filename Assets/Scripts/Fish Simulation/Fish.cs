@@ -1,90 +1,43 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(AvoidanceAdvancedSystem))]
 public class Fish : FishDetectable
 {
     private FishSimulation simulation;
     private List<FishDetectable> fishInRange = new();
-    AvoidanceAdvancedSystem script;
+    AvoidanceAdvancedSystem advancedAvoidance;
     public void Init(FishSimulation simulation)
     {
-        script = GetComponent<AvoidanceAdvancedSystem>();
+        advancedAvoidance = GetComponent<AvoidanceAdvancedSystem>();
 
         affectsAlignment = true;
         affectsSeparation = true;
         affectsCohesion = true;
 
         this.simulation = simulation;
+        GetComponent<SphereCollider>().radius = simulation.visualRange / transform.localScale.y;
         velocity = Random.insideUnitSphere * simulation.maxSpeed;
     }
 
     private void Update()
     {
-        
-        DetectFish();
-        //FlyTowardsCenter();
-        //AvoidOthers();
-        //MatchVelocity();
-        //LimitSpeed();
-        KeepWithinBounds();
-        if (IsHeadingForCollision())
+        //DetectFish();
+        FlyTowardsCenter();
+        AvoidOthers();
+        MatchVelocity();
+        LimitSpeed();
+        if (advancedAvoidance.IsHeadingForCollision())
         {
-            velocity = ObstacleRays().normalized * simulation.maxSpeed;
+            velocity = advancedAvoidance.GetFreeDirection().normalized * simulation.maxSpeed;
         }
+        KeepWithinBounds();
         transform.position += velocity * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(velocity);
     }
 
-    void DetectFish()
-    {
-        fishInRange.Clear();
-        RaycastHit[] hits = script.DetectObstacles();
-        if(hits.Length > 0)
-        {
-            foreach(RaycastHit hit in hits)
-            {
-                if(hit.collider.gameObject.TryGetComponent<Fish>(out Fish fish))
-                {
-                    if(fish != this)
-                    {
-                        fishInRange.Add(fish);
-                        Debug.DrawRay(transform.position, fish.transform.position * script.positionDistance, Color.green);
-                    }
-                }
-               
-            }
-        }
-    }
-    Vector3 ObstacleRays()
-    {
-        Vector3[] rayDirections = script.pos.ToArray();
-
-        for (int i = 0; i < rayDirections.Length; i++)
-        {
-            Vector3 dir = transform.TransformDirection(rayDirections[i]);
-            Ray ray = new Ray(transform.position, dir);
-            if (!Physics.SphereCast(ray, 0.01f, script.positionDistance *5))
-            {
-                Debug.DrawRay(transform.position, dir, Color.red);
-
-                return dir;
-            }
-        }
-        return transform.forward;
-    }
-    bool IsHeadingForCollision()
-    {
-        RaycastHit hit;
-        if (Physics.SphereCast(transform.position, 0.1f, transform.forward, out hit, script.positionDistance))
-        {
-            return true;
-        }
-        return false;
-    }
     #region Cohesion
     // Find the center of mass of the other boids and adjust velocity slightly to point towards the center of mass.
     private void FlyTowardsCenter()
@@ -171,10 +124,10 @@ public class Fish : FishDetectable
         {
             velocity.y -= simulation.turnFactor;
         }
-        //if (transform.position.y < simulation.transform.position.y - simulation.bounds.y)
-        //{
-        //    velocity.y += simulation.turnFactor;
-        //}
+        if (transform.position.y < simulation.transform.position.y - simulation.bounds.y)
+        {
+            velocity.y += simulation.turnFactor;
+        }
         if (transform.position.z > simulation.transform.position.z + simulation.bounds.z)
         {
             velocity.z -= simulation.turnFactor;
@@ -185,7 +138,22 @@ public class Fish : FishDetectable
         }
     }
 
-    #endregion
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.TryGetComponent(out Fish fish))
+        {
+            if (fishInRange.Contains(fish)) { return; }
+            fishInRange.Add(fish);
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.TryGetComponent(out Fish fish))
+        {
+            if (!fishInRange.Contains(fish)) { return; }
+            fishInRange.Remove(fish);
+        }
+    }
 
-    
+    #endregion
 }

@@ -14,6 +14,10 @@ public class BodyGenerator : MonoBehaviour
     private Dictionary<ulong, InteractiveBody> bodies = new Dictionary<ulong, InteractiveBody>();
     private KinectDataManager dataManager;
 
+    Kinect.Body[] data;
+    List<ulong> trackedIds = new List<ulong>();
+    List<ulong> knownIds = new List<ulong>();
+
     void Update()
     {
         dataManager = KinectDataManager.instance;
@@ -22,13 +26,13 @@ public class BodyGenerator : MonoBehaviour
             return;
         }
 
-        Kinect.Body[] data = dataManager.GetData();
+        data = dataManager.GetData();
         if (data == null)
         {
             return;
         }
 
-        List<ulong> trackedIds = new List<ulong>();
+        trackedIds.Clear();
         foreach (var body in data)
         {
             if (body == null)
@@ -42,7 +46,7 @@ public class BodyGenerator : MonoBehaviour
             }
         }
 
-        List<ulong> knownIds = new List<ulong>(bodies.Keys);
+        knownIds = new List<ulong>(bodies.Keys);
 
         // First delete untracked bodies
         foreach (ulong trackingId in knownIds)
