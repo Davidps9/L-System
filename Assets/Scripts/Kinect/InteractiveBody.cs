@@ -156,7 +156,8 @@ public class InteractiveBody : MonoBehaviour
                 if (leftHandState == Kinect.HandState.Closed && rightHandState == Kinect.HandState.Closed)
                 {
                     timer = 0;
-                    LSystemGenerator.instance.Generate(bones[Kinect.JointType.SpineBase].transform.position, lean, "L-System:" + id);
+                    float height = KinectDataManager.instance.GetVector3FromJoint(joints[Kinect.JointType.Head]).y;
+                    LSystemGenerator.instance.Generate(bones[Kinect.JointType.SpineBase].transform.position, lean, height, "L-System:" + id);
                 }
                 return;
             }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class LSystem : MonoBehaviour
 {
@@ -42,6 +43,8 @@ public class LSystem : MonoBehaviour
     [SerializeField] private float numberOfStages;
     [SerializeField] private int sideCount;
     [SerializeField] private Material material;
+    private Color lightColor;
+    private Color darkColor;
 
 #if UNITY_EDITOR
     [Header("Debug")]
@@ -52,16 +55,12 @@ public class LSystem : MonoBehaviour
     private string sentence = "", previousSentence = "";
     private List<Branch> pushedBranches = new();
 
-    private void Start()
-    {
-        if (ruleset != null)
-        {
-            GenerateLSystem(ruleset);
-        }
-    }
-
     public void GenerateLSystem(Ruleset ruleset)
     {
+        float hue = Random.value;
+        lightColor = Color.HSVToRGB(hue, 1, 1);
+        darkColor = Color.HSVToRGB((hue + 0.5f) % 1, 1, 0.5f);
+
         this.ruleset = ruleset;
         TurtleConversion();
     }
@@ -154,7 +153,7 @@ public class LSystem : MonoBehaviour
 
                 case RuleAction.PushBranch:
 
-                    pushedBranches.Last().CreateMesh(sideCount, material);
+                    pushedBranches.Last().CreateMesh(sideCount, lightColor, darkColor);
 
                     //Debug.Log("creanding branch " + (pushedBranches.Count + 1));
                     Branch newBranch = CreateBranch(pushedBranches.Last().transform, currentNode, "Branch lvl " + (pushedBranches.Count + 1));
@@ -169,7 +168,7 @@ public class LSystem : MonoBehaviour
 
                     if (pushedBranches.Count <= 1) { break; }
                     //Debug.Log("Ending branch " + pushedBranches.Count);
-                    pushedBranches.Last().CreateMesh(sideCount, material);
+                    pushedBranches.Last().CreateMesh(sideCount, lightColor, darkColor);
 
                     pushedBranches.RemoveAt(pushedBranches.Count - 1);
                     currentNode = null;
@@ -186,7 +185,7 @@ public class LSystem : MonoBehaviour
             }
 #endif
         }
-        pushedBranches.Last().CreateMesh(sideCount, material);
+        pushedBranches.Last().CreateMesh(sideCount, lightColor, darkColor);
 
         // cleanup extra iterations
         if (transform.childCount > 1)

@@ -270,6 +270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lsystemPrefab: {fileID: 8802994425009739933, guid: a0df025ed4645d8408a25052216ae5e6,
     type: 3}
+  maxInstances: 5
 --- !u!4 &535196798
 Transform:
   m_ObjectHideFlags: 0
@@ -760,7 +761,7 @@ GameObject:
   - component: {fileID: 1976885072}
   - component: {fileID: 1976885071}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

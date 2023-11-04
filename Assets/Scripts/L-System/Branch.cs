@@ -28,7 +28,7 @@ public class Branch : MonoBehaviour
         ApplyNode(newRootNode);
     }
 
-    public void CreateMesh(int sideCount, Material material)
+    public void CreateMesh(int sideCount, Color lightColor, Color darkColor)
     {
         if (nodes.Count < 1)
         {
@@ -36,7 +36,9 @@ public class Branch : MonoBehaviour
             return;
         }
 
-        meshRenderer.material = material;
+        meshRenderer.material.SetColor("_DarkColor", darkColor);
+        meshRenderer.material.SetColor("_LightColor", lightColor);
+
         Mesh mesh = MeshGenerator.GenerateMesh(nodes.ToArray(), sideCount, "Branch");
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;

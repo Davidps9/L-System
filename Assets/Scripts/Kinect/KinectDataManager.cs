@@ -84,9 +84,9 @@ public class KinectDataManager : MonoBehaviour
         }
     }
 
-    public static Vector3 GetVector3FromJoint(Joint joint)
+    public Vector3 GetVector3FromJoint(Joint joint)
     {
-        return new Vector3(joint.Position.X, joint.Position.Y, joint.Position.Z);
+        return kinectPosition.TransformPoint(joint.Position.X, joint.Position.Y, joint.Position.Z);
     }
 
     public Vector3 GetMirroredVector3FromJoint(Joint joint)
