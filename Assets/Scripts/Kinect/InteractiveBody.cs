@@ -34,10 +34,12 @@ public class InteractiveBody : MonoBehaviour
 
     private Vector3 leftHandPos = Vector3.zero, leftHandPrevPos = Vector3.zero;
     private Vector3 leftHandVelocity = Vector3.zero;
+    private Quaternion leftHandRotation;
     private Kinect.HandState leftHandState = Kinect.HandState.Unknown;
 
     private Vector3 rightHandPos = Vector3.zero, rightHandPrevPos = Vector3.zero;
     private Vector3 rightHandVelocity = Vector3.zero;
+    private Quaternion rightHandRotation;
     private Kinect.HandState rightHandState = Kinect.HandState.Unknown;
 
     public void Init(ulong id, GameObject bonePrefab, GameObject handIndicatorPrefab, float velocityThreshold, float stillTime)
@@ -78,6 +80,7 @@ public class InteractiveBody : MonoBehaviour
 
         leftHandPrevPos = leftHandPos;
         leftHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(joints[Kinect.JointType.HandLeft]);
+        leftHandRotation = Quaternion.LookRotation(leftHandPos - KinectDataManager.instance.GetMirroredVector3FromJoint(joints[Kinect.JointType.HandTipLeft]));
         if (leftHandPos != leftHandPrevPos)
         {
             leftHandVelocity = (leftHandPos - leftHandPrevPos) / Time.deltaTime;
@@ -85,6 +88,7 @@ public class InteractiveBody : MonoBehaviour
 
         rightHandPrevPos = rightHandPos;
         rightHandPos = KinectDataManager.instance.GetMirroredVector3FromJoint(joints[Kinect.JointType.HandRight]);
+        rightHandRotation = Quaternion.LookRotation(rightHandPos - KinectDataManager.instance.GetMirroredVector3FromJoint(joints[Kinect.JointType.HandTipRight]));
         if (rightHandPos != rightHandPrevPos)
         {
             rightHandVelocity = (rightHandPos - rightHandPrevPos) / Time.deltaTime;
@@ -125,12 +129,12 @@ public class InteractiveBody : MonoBehaviour
     {
         if (leftHandState != Kinect.HandState.Unknown)
         {
-            leftHandIndicator.SnapTo(leftHandPos);
+            leftHandIndicator.SnapTo(leftHandPos, leftHandRotation.eulerAngles.x);
         }
 
         if (rightHandState != Kinect.HandState.Unknown)
         {
-            rightHandIndicator.SnapTo(rightHandPos);
+            rightHandIndicator.SnapTo(rightHandPos, rightHandRotation.eulerAngles.x);
         }
     }
 
